@@ -49,7 +49,7 @@ Build mode: learn
   Learner check: Drag two issues into a new order, reload to confirm it stuck, then add an issue (or hand-edit a `createdAt`) so the automatic ranking would change, and confirm your placements held while the unplaced issue filled around them.
   Commit: `Persist manual row order across re-ranks`
 
-- [ ] **5. Open an issue, edit it, then complete or discard it**
+- [x] **5. Open an issue, edit it, then complete or discard it**
   Becomes usable: Double-clicking a row opens a detail view with the full description and Ranking Explanation, both editable and saved. Completed and Discarded buttons remove the issue, add a history entry, bump the matching last-two-day counter (Completed blue / Discarded red, centered), and the next-ranked issue fills the gap. The X exits.
   Why now: These are the journey's action steps and belong together — the action buttons live inside the detail view.
   PRD ref: `prd.md > Detail and edit mode`, `prd.md > Completing and discarding`, `prd.md > Screens and Layout` (counters)
@@ -59,15 +59,15 @@ Build mode: learn
   Learner check: Double-click an issue, edit its Ranking Explanation, complete it, and check that the blue counter moved and a new issue filled the slot.
   Commit: `Add detail/edit, complete/discard, and history counters`
 
-- [ ] **6. The in-app alert when the app is open at noon**
-  Becomes usable: If the app is open when `alertTime` passes, it asks the program to generate today's list and shows the in-app alert, with no manual refresh.
+- [ ] **6. The list refreshes quietly when the app is open at noon**
+  Becomes usable: If the app is open when `alertTime` passes, it asks the program to generate today's list and refreshes in the background, with no manual reload; the red badge appears on Issues. No pop-up.
   Why now: The last journey step. It reuses slice 3's generation endpoint, so it is small and safest once generation is proven.
-  PRD ref: `prd.md > The noon list and alert` (in-app alert)
+  PRD ref: `prd.md > The noon list and alert` (quiet refresh)
   Spec ref: `spec.md > How This Works, In Plain Language` (clock check), `spec.md > The Core Journey` (step 8)
-  Build: Timer in `app.js` that detects the alert time, calls generation, and surfaces the alert.
-  Verify (mechanical): With a near-future `alertTime`, leave the page open and confirm generation fires and the alert appears with no refresh.
-  Learner check: Set `alertTime` a minute ahead, leave the app open, and confirm it alerts and refreshes the list by itself.
-  Commit: `Fire the in-app noon alert while open`
+  Build: Timer in `app.js` that detects the alert time and calls generation; no visible pop-up.
+  Verify (mechanical): Assert the timer targets the next alert time (before/after noon), fires generation with no manual reload, and shows no banner.
+  Learner check: Set `alertTime` a minute ahead, leave the app open, and confirm the list refreshes and the red badge appears by itself, with no pop-up.
+  Commit: `Refresh the list quietly when open at noon`
 
 ## Hands-on Checkpoints
 
@@ -94,3 +94,4 @@ Activity mode:
 
 - The ranking rule was changed from difficulty → deadline-within-two-days → urgency to days-since-creation → urgency → difficulty → deadline, and the two-day deadline window was dropped — the learner confirmed during the early checkpoint that age should dominate, to surface issues that have been ignored longest.
 - The ignored count was dropped entirely: the left number on each row is now the issue's age in days, and `shownCount`/`lastShownDate` were removed from the data model. This replaces the original "quietly counts how many times it has shown up" accountability layer with the visible age — the learner's call.
+- The in-app noon banner was removed at the learner's request: the timer still generates the list when the app is open at noon, but it refreshes quietly and the red badge is the only signal — no pop-up.

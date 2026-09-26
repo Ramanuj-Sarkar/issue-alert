@@ -26,6 +26,7 @@ const detailDiscard = document.getElementById("detail-discard");
 
 const VISIBLE_ROWS = 6;
 let issuesById = new Map();
+let noonTimer = null;
 
 async function markSeen() {
   badge.hidden = true;
@@ -240,4 +241,24 @@ form.addEventListener("submit", async (event) => {
   await loadState();
 });
 
-loadState();
+function msUntilNextAlert(alertTime, now = new Date()) {
+  const [hours, minutes] = alertTime.split(":").map(Number);
+  const next = new Date(now.getFullYear(), now.getMonth(), now.getDate(), hours, minutes || 0, 0, 0);
+  if (next.getTime() <= now.getTime()) next.setDate(next.getDate() + 1);
+  return next.getTime() - now.getTime();
+}
+
+function scheduleNoonAlert(alertTime) {
+  if (noonTimer) clearTimeout(noonTimer);
+  noonTimer = setTimeout(async () => {
+    await loadState();
+    scheduleNoonAlert(alertTime);
+  }, msUntilNextAlert(alertTime) + 1000);
+}
+
+async function start() {
+  const state = await loadState();
+  scheduleNoonAlert(state.config.alertTime);
+}
+
+start();

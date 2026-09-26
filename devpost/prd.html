@@ -221,7 +221,7 @@
         <ul>
           <li>A fresh list of up to 6 is generated at noon; if fewer exist, only those show, packed to the top.</li>
           <li>If that happened since you last looked, a red badge appears on the Issues tab and clears when you click it.</li>
-          <li>If the app is open at noon, it alerts in-app. No notification while closed.</li>
+          <li>If the app is open at noon, it refreshes quietly in the background; the red badge is the only signal. No notification while closed.</li>
         </ul>
       </div>
     </div>
@@ -251,7 +251,7 @@
         <li><b>Drag-to-reorder</b> — persists across re-ranks.</li>
         <li><b>Detail/edit view</b> — full text, X to exit.</li>
         <li><b>Complete / Discard</b> — last-two-day counters.</li>
-        <li><b>Badge + in-app noon alert.</b></li>
+        <li><b>Badge + quiet noon refresh.</b></li>
       </ul>
     </section>
   </div>
@@ -292,7 +292,7 @@
     {t:"Reorder", d:"Drag rows to break ties; your manual order sticks."},
     {t:"Open detail", d:"Double-click a row to see the full description and Ranking Explanation, editable. X exits."},
     {t:"Complete or Discard", d:"The issue leaves the list, the matching counter increments, and the next-ranked issue fills the gap."},
-    {t:"Repeat daily", d:"At noon the list re-ranks; manual order and explanations carry over. In-app alert if open."}
+    {t:"Repeat daily", d:"At noon the list re-ranks; manual order and explanations carry over. Quiet refresh if open."}
   ];
   var stepper = document.getElementById('stepper');
   var panels = document.getElementById('panels');

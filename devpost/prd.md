@@ -17,7 +17,7 @@ Source: `scope.md > The Unique Kernel`, `scope.md > The Core Loop`.
 6. Drag rows to reorder. Your manual order sticks.
 7. Double-click an issue to open its detail view: full (untruncated) description and Ranking Explanation, editable. Exit with the X on the left.
 8. In detail, click **Completed** (blue) or **Discarded** (red). The issue leaves the list, the matching counter at the top increments, and the list reloads with the next-ranked issue filling the gap.
-9. Each day at noon, the list re-ranks. Manual order and Ranking Explanations carry over. If the app happens to be open at noon, it alerts in-app.
+9. Each day at noon, the list re-ranks. Manual order and Ranking Explanations carry over. If the app happens to be open at noon, it refreshes quietly and the red badge appears.
 
 Success: a reviewer can see the ranked list, open one issue, act on it, and then change a value in the text file or the source — and watch the app respond without losing saved data.
 
@@ -75,7 +75,7 @@ Ranking order, applied top to bottom:
 ### The noon list and alert
 - A fresh list of up to 6 issues is generated at noon each day; if fewer than 6 issues exist, only those show, packed into the top positions.
 - If that happened since the app was last viewed, a red badge appears on the Issues tab; clicking the tab clears it.
-- If the app is open at noon, it alerts in-app. There is no notification while the app is closed.
+- If the app is open at noon, it refreshes quietly in the background; the red badge is the only signal. There is no notification while the app is closed.
 - Acceptance: after noon, the list reflects a new ranking; the badge appears and clears on tab click.
 
 ## States and Boundaries
@@ -107,7 +107,7 @@ Ranking order, applied top to bottom:
 - Drag-to-reorder that survives re-ranks.
 - Detail/edit view with full description + Ranking Explanation and an X to exit.
 - Complete and Discard actions with last-two-day counters.
-- Red update badge and in-app noon alert.
+- Red update badge, refreshed quietly when the app is open at noon.
 
 ## Deferred From the POC
 - **Background notification while closed** — deliberately deferred in scope; open-at-noon keeps the build small.

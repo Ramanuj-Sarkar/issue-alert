@@ -39,7 +39,7 @@ The "oh, that's cool" beat: editing a plain text file changes how the app behave
 - Manual reorder as a tie-breaker; the manual order and the Ranking Explanation both persist across re-ranks.
 - Complete and delete; a count of items deleted in the last two days.
 - Code-level settings (easy to change in the source): number of results, alert time, difficulty/urgency levels. Issue data (including per-issue values) lives in the text file. Re-ranking reflects edits; stored data survives.
-- Alert in-app at noon only (no background notification).
+- When the app is open at noon it refreshes quietly; the update shows as the red badge (no pop-up, no background notification).
 
 ## Later
 - A true scheduled notification that fires while the app is closed.

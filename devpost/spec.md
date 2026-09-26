@@ -27,7 +27,7 @@ PRD ref: `prd.md > The Core Journey`.
 5. You drag a row. The page sends the new order; the program stores it so it survives the next re-rank.
 6. You double-click a row and get the full description and Ranking Explanation. Editing there saves back to the file.
 7. You click **Completed** or **Discarded**; the program records it in `history` and the issue leaves the active list. Reloading fills the slot with the next-ranked issue.
-8. If the app is open at noon, `app.js` fires a timer, asks the program to generate today's list, and shows the in-app alert.
+8. If the app is open at noon, `app.js` fires a timer, asks the program to generate today's list, and quietly refreshes; the red badge is the signal.
 
 ## Stack
 
@@ -84,7 +84,7 @@ The small set of endpoints the page calls (listed under External Services and De
 PRD ref: `prd.md > Features and Behavior`.
 
 ### Front end — `public/index.html`, `public/styles.css`, `public/app.js`
-The two tabs, the input form and its validation, the ranked list, drag-to-reorder, the detail/edit view, the counters, the red badge, and the in-app noon timer.
+The two tabs, the input form and its validation, the ranked list, drag-to-reorder, the detail/edit view, the counters, the red badge, and the quiet noon refresh timer.
 PRD ref: `prd.md > Screens and Layout`, `prd.md > Adding an issue — Input tab`, `prd.md > Detail and edit mode`, `prd.md > Completing and discarding`.
 
 ### Config — `src/config.js`
