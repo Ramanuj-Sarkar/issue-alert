@@ -59,7 +59,7 @@ Build mode: learn
   Learner check: Double-click an issue, edit its Ranking Explanation, complete it, and check that the blue counter moved and a new issue filled the slot.
   Commit: `Add detail/edit, complete/discard, and history counters`
 
-- [ ] **6. The list refreshes quietly when the app is open at noon**
+- [x] **6. The list refreshes quietly when the app is open at noon**
   Becomes usable: If the app is open when `alertTime` passes, it asks the program to generate today's list and refreshes in the background, with no manual reload; the red badge appears on Issues. No pop-up.
   Why now: The last journey step. It reuses slice 3's generation endpoint, so it is small and safest once generation is proven.
   PRD ref: `prd.md > The noon list and alert` (quiet refresh)
