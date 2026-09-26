@@ -91,6 +91,23 @@ router.get("/state", (req, res) => {
   });
 });
 
+router.post("/order", (req, res) => {
+  const ids = req.body;
+  if (!Array.isArray(ids)) {
+    return res.status(400).json({ error: "Expected an array of issue ids." });
+  }
+
+  const data = store.load();
+  const byId = new Map(data.issues.map((issue) => [issue.id, issue]));
+  ids.forEach((id, index) => {
+    const issue = byId.get(id);
+    if (issue) issue.manualRank = index;
+  });
+  store.save(data);
+
+  res.json({ ok: true });
+});
+
 router.post("/seen", (req, res) => {
   const data = store.load();
   data.lastViewedIssuesAt = new Date().toISOString();

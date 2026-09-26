@@ -45,10 +45,36 @@ function autoCompare(a, b) {
   return 0;
 }
 
+// The daily list. The automatic ranking first decides *which* issues make the
+// list (the top `dailyCount` by age/urgency/difficulty/deadline). Manual order
+// then decides their arrangement: issues placed by hand keep their position,
+// and the unplaced ones fill the gaps around them in automatic order. Because
+// selection happens before arrangement, a new issue can always surface.
 function rank(issues, dailyCount) {
   const active = issues.filter((issue) => issue.status === "active");
-  const ordered = [...active].sort(autoCompare);
-  return ordered.slice(0, dailyCount);
+  const autoOrder = [...active].sort(autoCompare);
+  const selected = autoOrder.slice(0, dailyCount);
+
+  const placed = selected
+    .filter((issue) => issue.manualRank != null)
+    .sort((a, b) => a.manualRank - b.manualRank);
+  const unplaced = selected.filter((issue) => issue.manualRank == null);
+
+  if (placed.length === 0) return selected;
+
+  const slots = new Array(selected.length).fill(null);
+  for (const issue of placed) {
+    let target = Math.min(Math.max(issue.manualRank, 0), slots.length - 1);
+    while (target < slots.length && slots[target]) target++;
+    if (target >= slots.length) target = slots.indexOf(null);
+    if (target >= 0) slots[target] = issue;
+  }
+
+  let next = 0;
+  for (let i = 0; i < slots.length; i++) {
+    if (!slots[i]) slots[i] = unplaced[next++];
+  }
+  return slots;
 }
 
 module.exports = { rank, autoCompare, daysSinceCreated, daysUntil };

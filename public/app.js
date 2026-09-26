@@ -85,8 +85,43 @@ function renderRow(issue) {
   meta.textContent = parts.join(" · ");
 
   row.append(count, main, meta);
+  row.draggable = true;
+  row.addEventListener("dragstart", () => row.classList.add("is-dragging"));
+  row.addEventListener("dragend", () => row.classList.remove("is-dragging"));
   return row;
 }
+
+function rowAfterPoint(y) {
+  const rows = [...list.querySelectorAll(".issue-row:not(.is-dragging)")];
+  let closest = { offset: Number.NEGATIVE_INFINITY, element: null };
+  for (const row of rows) {
+    const box = row.getBoundingClientRect();
+    const offset = y - box.top - box.height / 2;
+    if (offset < 0 && offset > closest.offset) closest = { offset, element: row };
+  }
+  return closest.element;
+}
+
+list.addEventListener("dragover", (event) => {
+  const dragging = list.querySelector(".is-dragging");
+  if (!dragging) return;
+  event.preventDefault();
+  const after = rowAfterPoint(event.clientY);
+  if (after) list.insertBefore(dragging, after);
+  else list.appendChild(dragging);
+});
+
+list.addEventListener("drop", async (event) => {
+  if (!list.querySelector(".is-dragging")) return;
+  event.preventDefault();
+  const ids = [...list.children].map((row) => row.dataset.id);
+  await fetch("/api/order", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(ids),
+  });
+  await loadState();
+});
 
 function render(state) {
   list.replaceChildren(...state.issues.map(renderRow));

@@ -179,6 +179,11 @@ select:focus {
   min-height: calc((100vh - 18rem) / 6);
   padding: 0.5rem 0;
   border-bottom: 1px solid var(--line);
+  cursor: grab;
+}
+
+.issue-row.is-dragging {
+  opacity: 0.4;
 }
 
 .issue-row__count {

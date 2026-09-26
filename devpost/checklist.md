@@ -29,7 +29,7 @@ Build mode: learn
   Learner check: Add a few issues, then hand-edit one issue's `createdAt` in `data/issues.json` to a few days ago, refresh, and confirm it climbs to the top; among same-age issues, check that urgency then difficulty then deadline set the order.
   Commit: `Rank the daily list by age, urgency, difficulty, then deadline`
 
-- [ ] **3. The noon list and the red badge**
+- [x] **3. The noon list and the red badge**
   Becomes usable: Opening the app at or after noon generates that day's list once and records `lastGeneratedDate`. A red badge appears on the Issues tab when a list was generated since you last looked, and clears when you open the tab.
   Why now: The spec's named uncertainty — how "noon" works with no background process — is settled here, before more list features build on it.
   PRD ref: `prd.md > The noon list and alert`
@@ -46,7 +46,7 @@ Build mode: learn
   Spec ref: `spec.md > Components > Ranking — src/ranking.js` (manual order), `spec.md > Data Model` (`manualRank`)
   Build: HTML5 drag events in `app.js`; `POST /api/order`; `ranking.js` merges manual placements with the auto order; persist `manualRank`.
   Verify (mechanical): Place issues, re-run generation, and confirm placed issues keep position while others sort around them; reload persists the order.
-  Learner check: Drag two issues into a new order, change a deadline so the auto-rank would move them, reopen Issues, and confirm your placements held.
+  Learner check: Drag two issues into a new order, reload to confirm it stuck, then add an issue (or hand-edit a `createdAt`) so the automatic ranking would change, and confirm your placements held while the unplaced issue filled around them.
   Commit: `Persist manual row order across re-ranks`
 
 - [ ] **5. Open an issue, edit it, then complete or discard it**
