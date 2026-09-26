@@ -91,6 +91,35 @@ router.get("/state", (req, res) => {
   });
 });
 
+router.put("/issues/:id", (req, res) => {
+  const data = store.load();
+  const issue = data.issues.find((item) => item.id === req.params.id);
+  if (!issue) return res.status(404).json({ error: "Issue not found." });
+
+  const { errors, value } = validateIssue(req.body || {});
+  if (Object.keys(errors).length > 0) {
+    return res.status(400).json({ error: "Please fix the highlighted fields.", fields: errors });
+  }
+
+  Object.assign(issue, value);
+  store.save(data);
+  res.json({ issue });
+});
+
+function concludeIssue(req, res, outcome) {
+  const data = store.load();
+  const issue = data.issues.find((item) => item.id === req.params.id);
+  if (!issue) return res.status(404).json({ error: "Issue not found." });
+
+  issue.status = outcome;
+  data.history.push({ id: issue.id, outcome, at: new Date().toISOString() });
+  store.save(data);
+  res.json({ ok: true });
+}
+
+router.post("/issues/:id/complete", (req, res) => concludeIssue(req, res, "completed"));
+router.post("/issues/:id/discard", (req, res) => concludeIssue(req, res, "discarded"));
+
 router.post("/order", (req, res) => {
   const ids = req.body;
   if (!Array.isArray(ids)) {

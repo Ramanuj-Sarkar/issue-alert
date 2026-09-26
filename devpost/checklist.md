@@ -39,7 +39,7 @@ Build mode: learn
   Learner check: Set `alertTime` in `src/config.js` a couple of minutes ahead (or clear `lastGeneratedDate` in `data/issues.json`), reopen after it passes, and check the red badge appears then clears when you open Issues.
   Commit: `Generate the daily list on open and show the update badge`
 
-- [ ] **4. Drag rows to set your own order, and it survives the next re-rank**
+- [x] **4. Drag rows to set your own order, and it survives the next re-rank**
   Becomes usable: Dragging a row sets a manual position that persists. When the automatic ranking runs again, hand-placed issues keep their spot and the rest sort around them.
   Why now: The spec calls this the subtlest behavior and says to verify it before the other list features; it depends on slice 2's ranking being in place.
   PRD ref: `prd.md > Manual ordering`

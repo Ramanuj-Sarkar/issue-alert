@@ -17,8 +17,15 @@ const completedCount = document.getElementById("completed-count");
 const discardedCount = document.getElementById("discarded-count");
 const scrollDown = document.getElementById("scroll-down");
 const badge = document.getElementById("badge");
+const detail = document.getElementById("detail");
+const detailForm = document.getElementById("detail-form");
+const detailStatus = document.getElementById("detail-status");
+const detailClose = document.getElementById("detail-close");
+const detailComplete = document.getElementById("detail-complete");
+const detailDiscard = document.getElementById("detail-discard");
 
 const VISIBLE_ROWS = 6;
+let issuesById = new Map();
 
 async function markSeen() {
   badge.hidden = true;
@@ -37,15 +44,15 @@ function showTab(name) {
 tabs.input.addEventListener("click", () => showTab("input"));
 tabs.issues.addEventListener("click", () => showTab("issues"));
 
-function clearErrors() {
-  for (const el of document.querySelectorAll("[data-error-for]")) {
+function clearErrors(container = document) {
+  for (const el of container.querySelectorAll("[data-error-for]")) {
     el.textContent = "";
   }
 }
 
-function showErrors(fields) {
+function showErrors(container, fields) {
   for (const [name, message] of Object.entries(fields || {})) {
-    const el = document.querySelector(`[data-error-for="${name}"]`);
+    const el = container.querySelector(`[data-error-for="${name}"]`);
     if (el) el.textContent = message;
   }
 }
@@ -88,6 +95,7 @@ function renderRow(issue) {
   row.draggable = true;
   row.addEventListener("dragstart", () => row.classList.add("is-dragging"));
   row.addEventListener("dragend", () => row.classList.remove("is-dragging"));
+  row.addEventListener("dblclick", () => openDetail(row.dataset.id));
   return row;
 }
 
@@ -123,7 +131,68 @@ list.addEventListener("drop", async (event) => {
   await loadState();
 });
 
+function openDetail(id) {
+  const issue = issuesById.get(id);
+  if (!issue) return;
+  detailForm.elements.title.value = issue.title;
+  detailForm.elements.description.value = issue.description;
+  detailForm.elements.urgency.value = issue.urgency;
+  detailForm.elements.difficulty.value = issue.difficulty;
+  detailForm.elements.deadline.value = issue.deadline || "";
+  detailForm.elements.rankingExplanation.value = issue.rankingExplanation || "";
+  detail.dataset.id = id;
+  clearErrors(detailForm);
+  detailStatus.hidden = true;
+  detail.hidden = false;
+}
+
+function closeDetail() {
+  detail.hidden = true;
+}
+
+detailClose.addEventListener("click", closeDetail);
+
+async function putDetail() {
+  const body = Object.fromEntries(new FormData(detailForm).entries());
+  const response = await fetch(`/api/issues/${detail.dataset.id}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+  if (!response.ok) {
+    const problem = await response.json().catch(() => ({}));
+    showErrors(detailForm, problem.fields);
+    detailStatus.textContent = problem.error || "Could not save the issue.";
+    detailStatus.hidden = false;
+    return false;
+  }
+  return true;
+}
+
+detailForm.addEventListener("submit", async (event) => {
+  event.preventDefault();
+  clearErrors(detailForm);
+  detailStatus.hidden = true;
+  if (await putDetail()) {
+    detailStatus.textContent = "Saved.";
+    detailStatus.hidden = false;
+    await loadState();
+  }
+});
+
+async function conclude(action) {
+  clearErrors(detailForm);
+  if (!(await putDetail())) return;
+  await fetch(`/api/issues/${detail.dataset.id}/${action}`, { method: "POST" });
+  closeDetail();
+  await loadState();
+}
+
+detailComplete.addEventListener("click", () => conclude("complete"));
+detailDiscard.addEventListener("click", () => conclude("discard"));
+
 function render(state) {
+  issuesById = new Map(state.issues.map((issue) => [issue.id, issue]));
   list.replaceChildren(...state.issues.map(renderRow));
   emptyState.hidden = state.issues.length > 0;
   completedCount.textContent = state.counters.completed;
@@ -145,7 +214,7 @@ async function loadState() {
 
 form.addEventListener("submit", async (event) => {
   event.preventDefault();
-  clearErrors();
+  clearErrors(form);
   formStatus.hidden = true;
 
   const body = Object.fromEntries(new FormData(form).entries());
@@ -158,7 +227,7 @@ form.addEventListener("submit", async (event) => {
 
   if (!response.ok) {
     const problem = await response.json().catch(() => ({}));
-    showErrors(problem.fields);
+    showErrors(form, problem.fields);
     formStatus.textContent = problem.error || "Could not save the issue.";
     formStatus.hidden = false;
     return;

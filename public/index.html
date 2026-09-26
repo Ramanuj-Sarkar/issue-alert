@@ -94,6 +94,64 @@
       </section>
     </main>
 
+    <div id="detail" class="detail" hidden>
+      <div class="detail__inner">
+        <button type="button" id="detail-close" class="detail__close" aria-label="Close">✕</button>
+        <form id="detail-form" novalidate>
+          <div class="field">
+            <label for="detail-title">Title</label>
+            <input id="detail-title" name="title" type="text" autocomplete="off" />
+            <p class="error" data-error-for="title"></p>
+          </div>
+
+          <div class="field">
+            <label for="detail-description">Description</label>
+            <textarea id="detail-description" name="description" rows="3"></textarea>
+            <p class="error" data-error-for="description"></p>
+          </div>
+
+          <div class="field">
+            <label for="detail-urgency">Urgency</label>
+            <select id="detail-urgency" name="urgency">
+              <option value="Low">Low</option>
+              <option value="Medium">Medium</option>
+              <option value="High">High</option>
+            </select>
+            <p class="error" data-error-for="urgency"></p>
+          </div>
+
+          <div class="field">
+            <label for="detail-difficulty">Difficulty</label>
+            <select id="detail-difficulty" name="difficulty">
+              <option value="Low">Low</option>
+              <option value="Medium">Medium</option>
+              <option value="High">High</option>
+            </select>
+            <p class="error" data-error-for="difficulty"></p>
+          </div>
+
+          <div class="field">
+            <label for="detail-deadline">Deadline <span class="hint">optional, YYYY-MM-DD</span></label>
+            <input id="detail-deadline" name="deadline" type="text" placeholder="YYYY-MM-DD" autocomplete="off" />
+            <p class="error" data-error-for="deadline"></p>
+          </div>
+
+          <div class="field">
+            <label for="detail-rankingExplanation">Ranking Explanation <span class="hint">optional</span></label>
+            <textarea id="detail-rankingExplanation" name="rankingExplanation" rows="3"></textarea>
+            <p class="error" data-error-for="rankingExplanation"></p>
+          </div>
+
+          <div class="detail__actions">
+            <button type="submit" class="primary">Save</button>
+            <button type="button" id="detail-complete" class="primary button--completed">Completed</button>
+            <button type="button" id="detail-discard" class="primary button--discarded">Discarded</button>
+          </div>
+          <p id="detail-status" class="status" hidden></p>
+        </form>
+      </div>
+    </div>
+
     <script src="/app.js"></script>
   </body>
 </html>
