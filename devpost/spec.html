@@ -80,7 +80,7 @@
     <ul class="clean">
       <li><b>A page you see</b> — two tabs, Input and Issues, drawn by plain HTML/CSS/JS files you can open and read.</li>
       <li><b>A small program that serves it</b> — Node.js + Express answers <code>localhost:3000</code> and handles small requests ("give me the issues", "save this").</li>
-      <li><b>A text file that holds everything</b> — <span class="filetag">data/issues.json</span>. Issues, shown-counts, manual order, and history are all plain JSON you can edit by hand.</li>
+      <li><b>A text file that holds everything</b> — <span class="filetag">data/issues.json</span>. Issues, manual order, and history are all plain JSON you can edit by hand.</li>
       <li><b>A clock check, not a background service</b> — open after noon and the program builds today's list if it hasn't; if the app is open at noon, the page asks for the same.</li>
     </ul>
     <p class="note">Why this shape: a browser page can't write your file on its own, and an always-running scheduler adds parts that are hard to debug. One local program + an on-open check keeps it to one command, one file, no accounts, no cloud.</p>
@@ -115,7 +115,7 @@
         <text x="748" y="110" text-anchor="middle" font-size="15" font-weight="700" fill="#5b4b8a">issues.json</text>
         <line x1="666" y1="124" x2="830" y2="124" stroke="#e3e7ec"/>
         <text x="748" y="146" text-anchor="middle" font-size="11.5" fill="#606a75">issues + fields</text>
-        <text x="748" y="167" text-anchor="middle" font-size="11.5" fill="#606a75">shownCount · manualRank</text>
+        <text x="748" y="167" text-anchor="middle" font-size="11.5" fill="#606a75">manualRank · createdAt</text>
         <text x="748" y="188" text-anchor="middle" font-size="11.5" fill="#606a75">history (done/discarded)</text>
         <text x="748" y="209" text-anchor="middle" font-size="11.5" fill="#606a75">lastGenerated · lastViewed</text>
         <text x="748" y="229" text-anchor="middle" font-size="11" font-style="italic" fill="#5b4b8a">hand-editable</text>
@@ -169,7 +169,7 @@
     <div class="reveal" data-open="true">
       <button type="button" aria-expanded="true"><span class="tag">File</span> <span class="filetag">src/ranking.js</span> — ranking <span class="chev">›</span></button>
       <div class="body"><ul>
-        <li>Sorts: difficulty (hard first) → deadline within two days (closest first) → urgency (high first).</li>
+        <li>Sorts: days since creation (oldest first) → urgency (high first) → difficulty (hard first) → deadline (closest first; no deadline last).</li>
         <li>Applies manual order: dragged issues keep their spot, the rest sort around them.</li>
         <li>PRD: <code>The ranked list — Issues tab</code>, <code>Manual ordering</code>.</li>
       </ul></div>
@@ -178,7 +178,7 @@
       <button type="button" aria-expanded="true"><span class="tag">File</span> <span class="filetag">src/scheduler.js</span> — the noon check <span class="chev">›</span></button>
       <div class="body"><ul>
         <li>On each list request: if it's at/after <code>alertTime</code> and today's list isn't made, make it.</li>
-        <li>Marks the date and adds 1 to each appearing issue's <code>shownCount</code> — once per day.</li>
+        <li>Marks today's date as generated — once per day.</li>
         <li>PRD: <code>The noon list and alert</code>.</li>
       </ul></div>
     </div>
@@ -217,8 +217,6 @@
       "difficulty": "High",
       "deadline": "2026-09-25",
       "rankingExplanation": "Must be filed before Friday.",
-      "shownCount": 4,            <span class="c"># times it appeared, undone</span>
-      "lastShownDate": "2026-09-24",
       "manualRank": null,         <span class="c"># set when you drag it</span>
       "status": "active",
       "createdAt": "2026-09-20T09:00:00.000Z"
@@ -232,7 +230,6 @@
       <tr><th>Data</th><th>Where it lives · what happens on return</th></tr>
       <tr><td>Issues + fields</td><td>In <code>issues[]</code>; re-read from the file on every load, so hand-edits show after refresh.</td></tr>
       <tr><td>Manual order</td><td><code>manualRank</code> per issue; lets a dragged position survive the next re-rank.</td></tr>
-      <tr><td>Shown count</td><td><code>shownCount</code> + <code>lastShownDate</code>; +1 once per day an issue is on the list.</td></tr>
       <tr><td>Counters</td><td>Computed from <code>history[]</code> — completed/discarded in the last two days.</td></tr>
       <tr><td>Badge</td><td><code>lastGeneratedDate</code> vs <code>lastViewedIssuesAt</code>.</td></tr>
     </table>
@@ -278,7 +275,7 @@
       <li><b>issues.json is missing</b> → the program creates an empty one; first run just works.</li>
       <li><b>issues.json is malformed</b> (a hand-edit broke the JSON) → it will not overwrite it; you get a plain message naming the file and the parse error so you can fix it.</li>
       <li><b>Invalid input</b> on the Input tab → a field-level error; nothing is saved.</li>
-      <li><b>Never opened for days</b> → those days don't advance the shown-count; the next open makes one list for that day (agreed behavior).</li>
+      <li><b>Never opened for days</b> → no list is made for those days; the next open makes one list for that day (agreed behavior).</li>
     </ul>
   </section>
 
@@ -306,7 +303,7 @@
     <div class="note">
       <b>Open issues:</b>
       <ul style="margin:8px 0 0">
-        <li>From the PRD: confirm the "deadline within two days" tier — spec-independent; try it and adjust <code>ranking.js</code> if it feels wrong.</li>
+        <li>Resolved during build: the comparator now sorts by days since creation first, then urgency, then difficulty, then deadline; the two-day deadline window was removed. See the build checklist's Revisions.</li>
         <li>The manual-order rule is the subtlest behavior — build and verify it first, before the rest of the list features.</li>
       </ul>
     </div>
@@ -319,7 +316,7 @@
   var steps = [
     {t:"Start the program", d:"npm start serves the page; you open localhost:3000 in your browser."},
     {t:"Add an issue (Input)", d:"The page sends the fields to the program, which validates and writes them into data/issues.json."},
-    {t:"The noon list is built", d:"On the first request at/after noon today, the program ranks issues and adds 1 to each one's shown-count."},
+    {t:"The noon list is built", d:"On the first request at/after noon today, the program ranks issues and records today as generated."},
     {t:"Open Issues", d:"Up to six ranked rows appear; the red badge (a list was made since you last looked) clears. Counters come from history."},
     {t:"Drag a row", d:"The new order is sent and stored in manualRank, so it survives the next re-rank."},
     {t:"Open detail (double-click)", d:"Full description and Ranking Explanation; edits save back to the file. X exits."},

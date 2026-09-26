@@ -115,7 +115,7 @@
         <!-- noon -->
         <rect x="515" y="20" width="150" height="60" rx="12" fill="#e8f0fa" stroke="#c9dcf2"/>
         <text x="590" y="45" text-anchor="middle" font-size="13" font-weight="700" fill="#2563b6">Noon ranking</text>
-        <text x="590" y="64" text-anchor="middle" font-size="10.5" fill="#2563b6">difficulty → deadline → urgency</text>
+        <text x="590" y="64" text-anchor="middle" font-size="10.5" fill="#2563b6">age → urgency → difficulty</text>
 
         <!-- list -->
         <rect x="515" y="104" width="150" height="86" rx="12" fill="#f4f6f8" stroke="#d5dde5"/>
@@ -158,9 +158,10 @@
   <section>
     <h2>Where ranking comes from</h2>
     <ol class="rank">
-      <li><b>Difficulty — hard first.</b> High outranks Medium outranks Low, so the hard things get finished first.</li>
-      <li><b>Deadline within two days — closest first.</b> Any issue due within two days beats one that isn't.</li>
-      <li><b>Urgency — high first.</b> The final tie-breaker.</li>
+      <li><b>Days since creation — oldest first.</b> The longer an issue has been waiting, the higher it ranks, so nothing gets quietly buried.</li>
+      <li><b>Urgency — high first.</b> Among issues of the same age.</li>
+      <li><b>Difficulty — hard first.</b> Among issues of the same age and urgency.</li>
+      <li><b>Deadline — closest first.</b> The final tie-breaker; no deadline sits last at this step.</li>
     </ol>
     <p class="note">Drag-to-reorder overrides the automatic order for ties, and your manual placements survive the next noon re-rank. The "why" you read is just the visible values plus the Ranking Explanation you type — the app writes no explanation of its own.</p>
   </section>
@@ -197,7 +198,7 @@
           <span class="vals">Medium · High · 2026-09-26</span>
         </div>
         <ul style="margin-top:12px">
-          <li>Row order: ignored count (left) · title (large) + truncated description (middle) · urgency, difficulty, deadline (right).</li>
+          <li>Row order: days since creation (left) · title (large) + truncated description (middle) · urgency, difficulty, deadline (right).</li>
           <li>Counters count the last two days. Six rows fit on screen; raise the count in code and a down-arrow + scroll reveal the rest.</li>
         </ul>
       </div>
@@ -207,7 +208,7 @@
       <button type="button" aria-expanded="true"><span class="tag">Detail</span> Open, edit, act <span class="chev">›</span></button>
       <div class="body">
         <ul>
-          <li>Double-click a row: form-like separate rows, full (untruncated) description and Ranking Explanation, editable; ignored count hidden.</li>
+          <li>Double-click a row: form-like separate rows, full (untruncated) description and Ranking Explanation, editable.</li>
           <li>X on the left exits back to the list.</li>
           <li><b>Completed</b> (blue) or <b>Discarded</b> (red) removes the issue, bumps the matching counter, and the next-ranked issue fills the gap.</li>
         </ul>
@@ -244,7 +245,7 @@
       <ul class="now">
         <li><b>Input tab</b> — six fields, validation.</li>
         <li><b>Text-file storage</b> — settings in code.</li>
-        <li><b>Noon ranking</b> — difficulty → deadline → urgency.</li>
+        <li><b>Noon ranking</b> — age → urgency → difficulty → deadline.</li>
         <li><b>Issues list</b> — counters, ranked rows, right-side values.</li>
         <li><b>Six-fit sizing</b> — scroll + down-arrow when raised.</li>
         <li><b>Drag-to-reorder</b> — persists across re-ranks.</li>
@@ -275,7 +276,7 @@
         <li><b>An app-computed explanation sentence</b> — you chose visible values plus your own note.</li>
       </ul></div>
     </div>
-    <p class="note"><b>Open question before build:</b> confirm the ranking tier — "deadline within two days" treated as a single tier above everything else. Does not block the technical spec.</p>
+    <p class="note"><b>Resolved during build:</b> the ranking is now days since creation (oldest first) → urgency → difficulty → deadline, replacing difficulty → deadline-within-two-days → urgency, and the two-day deadline window was removed. See the build checklist's Revisions.</p>
   </section>
 
   <footer>Markdown stays canonical: <code>devpost/prd.md</code></footer>
@@ -287,9 +288,9 @@
     {t:"Fill the form rows", d:"Title, Description, Urgency, Difficulty, optional Deadline, optional Ranking Explanation — with validation on bad values."},
     {t:"Submit", d:"The issue is saved to the plain-text file."},
     {t:"Noon list is generated", d:"A fresh ranked list of up to 6 appears; a red badge marks it on the Issues tab if you haven't looked yet."},
-    {t:"Open the Issues tab", d:"The badge clears. Up to 6 issues are ranked and shown, each row: ignored count · title + truncated description · urgency/difficulty/deadline."},
+    {t:"Open the Issues tab", d:"The badge clears. Up to 6 issues are ranked and shown, each row: days since creation · title + truncated description · urgency/difficulty/deadline."},
     {t:"Reorder", d:"Drag rows to break ties; your manual order sticks."},
-    {t:"Open detail", d:"Double-click a row to see the full description and Ranking Explanation, editable, ignored count hidden. X exits."},
+    {t:"Open detail", d:"Double-click a row to see the full description and Ranking Explanation, editable. X exits."},
     {t:"Complete or Discard", d:"The issue leaves the list, the matching counter increments, and the next-ranked issue fills the gap."},
     {t:"Repeat daily", d:"At noon the list re-ranks; manual order and explanations carry over. In-app alert if open."}
   ];

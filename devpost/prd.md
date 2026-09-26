@@ -13,9 +13,9 @@ Source: `scope.md > The Unique Kernel`, `scope.md > The Core Loop`.
 2. Fill the form rows: Title, Description, Urgency (Low/Medium/High), Difficulty (Low/Medium/High), optional Deadline (YYYY-MM-DD), and optional Ranking Explanation. Values that don't fit are rejected with a visible error.
 3. Submit. The issue is saved to the text file.
 4. A fresh noon list of 6 is generated; if that happened since you last looked, a red badge appears on the **Issues** tab.
-5. Click **Issues**. The badge clears. Up to 6 issues are ranked and shown, each row reading left to right: ignored count, title + truncated description, then urgency / difficulty / deadline.
+5. Click **Issues**. The badge clears. Up to 6 issues are ranked and shown, each row reading left to right: days since creation, title + truncated description, then urgency / difficulty / deadline.
 6. Drag rows to reorder. Your manual order sticks.
-7. Double-click an issue to open its detail view: full (untruncated) description and Ranking Explanation, editable, with the ignored count hidden. Exit with the X on the left.
+7. Double-click an issue to open its detail view: full (untruncated) description and Ranking Explanation, editable. Exit with the X on the left.
 8. In detail, click **Completed** (blue) or **Discarded** (red). The issue leaves the list, the matching counter at the top increments, and the list reloads with the next-ranked issue filling the gap.
 9. Each day at noon, the list re-ranks. Manual order and Ranking Explanations carry over. If the app happens to be open at noon, it alerts in-app.
 
@@ -27,7 +27,7 @@ Two browser-style tabs across the top, **Input** and **Issues**, with the active
 **Input tab** — labeled form rows, each on its own line, with blank fields beside the labels. Light, large text.
 
 **Issues tab** — top row: two counters centered on either side of the screen's center line, each with a label above its number. **Completed** — label and number both in blue — sits to the left of center; **Discarded** — label and number both in red — sits to the right. Below: the ranked list. Each issue row is arranged left to right as:
-- ignored count (leftmost),
+- days since creation (leftmost),
 - title (large) on its own line, with the description truncated to a single line directly **beneath** it (middle),
 - urgency, difficulty, and deadline (right).
 
@@ -49,20 +49,20 @@ Light mode: white background, black text. Large text throughout, with titles not
 
 ### The ranked list — Issues tab
 Ranking order, applied top to bottom:
-1. **Difficulty**, hard first: High > Medium > Low.
-2. **Deadline within two days** — issues due within two days of today come before the rest, ordered by closest deadline first.
-3. **Urgency**, high first: High > Medium > Low.
+1. **Days since creation**, oldest first — the longer an issue has been waiting, the higher it ranks.
+2. **Urgency**, high first: High > Medium > Low.
+3. **Difficulty**, hard first: High > Medium > Low.
+4. **Deadline**, closest first; issues with no deadline sit last at this step.
 
-- Each row shows ignored count (left), title + truncated description (middle), urgency/difficulty/deadline (right).
-- The ignored count is how many noon lists this issue has appeared on without being completed or discarded.
-- Acceptance: with a mix of issues, the list matches the rule above; each row shows its count, title, truncated description, and the three values.
+- Each row shows days since creation (left), title + truncated description (middle), urgency/difficulty/deadline (right).
+- Acceptance: with a mix of issues, the list matches the rule above; each row shows its age, title, truncated description, and the three values.
 
 ### Manual ordering
 - Drag a row to a new position to break ties.
 - Acceptance: a manual order survives the next noon re-rank; the automatic ranking reorders around issues you placed by hand.
 
 ### Detail and edit mode
-- Double-click a row to open it. Full description and Ranking Explanation are shown; the ignored count is hidden.
+- Double-click a row to open it. Full description and Ranking Explanation are shown.
 - Edits made here are saved to the text file.
 - Acceptance: editing a field in detail view persists and is reflected in the list after exiting.
 
@@ -88,21 +88,21 @@ Ranking order, applied top to bottom:
 - **Daily re-rank** — every noon the automatic order is recomputed around any manual placements.
 
 ## Product Decisions
-- **Hard first** — a hard issue outranks an easy one so the hard things get finished first.
-- **Deadline window is two days** — only deadlines within two days affect rank, closest first.
-- **Urgency is the final tie-breaker.**
-- **No algorithm-generated explanation** — the "why" is the visible urgency/difficulty/deadline plus the learner's own Ranking Explanation.
+- **Age first** — an issue that has been waiting longer outranks a newer one, so nothing gets quietly buried: the older it gets, the higher it climbs.
+- **Urgency next, then difficulty** — among issues of the same age, the more urgent one ranks higher, then the harder one.
+- **Deadline is the final tie-breaker** — closest first; an issue with no deadline sits last at this step. The original "deadline within two days" window has been removed.
+- **No ignored count** — the number on the left of each row is the issue's age in days, not a tally of how often it has appeared; the visible age is itself the accountability signal.
+- **No algorithm-generated explanation** — the "why" is the visible age/urgency/difficulty plus the learner's own Ranking Explanation.
 - **Manual order and Ranking Explanation persist** across noon re-ranks rather than being overwritten.
 - **Issues live in the text file; settings live in code** — number of results, alert time, and difficulty/urgency levels are source-level values; issue data (including per-issue values) is hand-editable text.
 - **Completed and Discarded are separate, last-two-day counters** — both the label text and the number are colored (Completed blue, Discarded red), and the pair is centered so Completed sits left of the center line and Discarded right.
 - **Open-at-noon over background notifications** — keeps the build small while preserving the daily ritual.
-- **Assumption (to confirm):** the "deadline within two days" rule is treated as a single tier — any issue due within two days outranks every issue that isn't, and issues due later or with no deadline tie at that step and fall through to urgency.
 
 ## What We're Building
 - Input tab with the six fields and validation.
 - Text-file storage of issues; settings in code.
-- Noon ranking: difficulty (hard first) → deadline within two days (closest first) → urgency.
-- Issues tab: Completed/Discarded counters, ranked rows with ignored count, title, truncated description, and right-side values.
+- Noon ranking: days since creation (oldest first) → urgency (High first) → difficulty (High first) → deadline (closest first).
+- Issues tab: Completed/Discarded counters, ranked rows with days since creation, title, truncated description, and right-side values.
 - Row sizing for six, scroll + down-arrow when the count is raised.
 - Drag-to-reorder that survives re-ranks.
 - Detail/edit view with full description + Ranking Explanation and an X to exit.
@@ -126,4 +126,4 @@ Ranking order, applied top to bottom:
 - An app-computed explanation sentence — the learner chose visible values plus their own note.
 
 ## Open Questions
-- Confirm the ranking-tier assumption above (deadline within two days as a single tier) before `5-build`; it does not block `4-spec`.
+- Resolved during `5-build`: the ranking order is now days since creation (oldest first) → urgency → difficulty → deadline, replacing the original difficulty → deadline-within-two-days → urgency, and the two-day deadline window was removed. See `checklist.md > Revisions`.

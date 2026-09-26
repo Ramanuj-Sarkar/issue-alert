@@ -76,7 +76,7 @@
   <section class="kernel">
     <h2>The unique kernel</h2>
     <p class="big">Most to-do apps store tasks and wait for you to decide. This one makes the decision <em>for</em> you — and then shows its work.</p>
-    <p>At noon it ranks your issues (hard first, then imminent deadlines, then urgency), explains why each landed where it did, and quietly counts how many days an issue has shown up without getting done. The point isn't an organized list — it's trusting a decision so you stop second-guessing yourself. The accountability layer ("you've been ignoring this one") is what makes it more than a generic list.</p>
+    <p>At noon it ranks your issues by how long they've been waiting (oldest first), then by urgency, then difficulty, then deadline, and it shows each issue's age so the decision is legible. The point isn't an organized list — it's trusting a decision so you stop second-guessing yourself. The accountability layer ("the one you keep not doing keeps climbing, visibly a day older") is what makes it more than a generic list.</p>
   </section>
 
   <section>
@@ -98,12 +98,12 @@
 
         <rect x="300" y="30" width="220" height="192" rx="14" fill="#e8f1ec" stroke="#cfe2d7"/>
         <text x="410" y="60" text-anchor="middle" font-size="15" font-weight="700" fill="#151a21">Noon ranking</text>
-        <text x="410" y="86" text-anchor="middle" font-size="12" fill="#3c5a49">1 · difficulty (hard first)</text>
-        <text x="410" y="107" text-anchor="middle" font-size="12" fill="#3c5a49">2 · deadline ≤ 2 days</text>
-        <text x="410" y="128" text-anchor="middle" font-size="12" fill="#3c5a49">3 · urgency</text>
+        <text x="410" y="86" text-anchor="middle" font-size="12" fill="#3c5a49">1 · days since creation</text>
+        <text x="410" y="107" text-anchor="middle" font-size="12" fill="#3c5a49">2 · urgency</text>
+        <text x="410" y="128" text-anchor="middle" font-size="12" fill="#3c5a49">3 · difficulty · deadline</text>
         <line x1="332" y1="146" x2="488" y2="146" stroke="#cfe2d7"/>
         <text x="410" y="170" text-anchor="middle" font-size="12" fill="#3c5a49">+ why each one ranked</text>
-        <text x="410" y="190" text-anchor="middle" font-size="12" fill="#3c5a49">+ days shown, undone</text>
+        <text x="410" y="190" text-anchor="middle" font-size="12" fill="#3c5a49">+ its age, in days</text>
         <text x="410" y="210" text-anchor="middle" font-size="12" fill="#3c5a49">= 6 issues</text>
 
         <rect x="626" y="86" width="176" height="80" rx="14" fill="#eef2f6" stroke="#d5dde5"/>
@@ -148,7 +148,7 @@
 
   <section>
     <h2>What "working" looks like</h2>
-    <p>Open the app at/after noon: 6 issues ranked and waiting, each with a short reason and an ignored-count. Add, complete, delete. Then the proving moment — add a Ranking Explanation and drag an issue to a new spot, let the next noon re-rank run, and confirm your order and explanation are still there while the automatic ranking updated around them. Edit an issue in the text file, change a code-level value (count, noon time), reload: the list reflects it and nothing you'd saved is lost.</p>
+    <p>Open the app at/after noon: 6 issues ranked and waiting, each with a short reason and its age. Add, complete, delete. Then the proving moment — add a Ranking Explanation and drag an issue to a new spot, let the next noon re-rank run, and confirm your order and explanation are still there while the automatic ranking updated around them. Edit an issue in the text file, change a code-level value (count, noon time), reload: the list reflects it and nothing you'd saved is lost.</p>
     <div class="beat"><strong>The "oh, that's cool" beat:</strong> editing a plain text file changes how the app behaves, and everything already saved stays intact.</div>
   </section>
 
@@ -164,8 +164,8 @@
         <ul>
           <li>Local app; issues stored in a human-editable text file (no cloud, no database, no accounts).</li>
           <li>Issues with title, description, difficulty, urgency, optional deadline, and an optional Ranking Explanation.</li>
-          <li>Top-6 daily list ranked: difficulty (hard first) → deadline ≤ 2 days (closer first) → urgency.</li>
-          <li>A visible reason per rank, plus a "shown up without being completed" count.</li>
+          <li>Top-6 daily list ranked: days since creation (oldest first) → urgency → difficulty → deadline (closest first).</li>
+          <li>A visible reason per rank, and its age shown on the row.</li>
           <li>Manual reorder as a tie-breaker; the manual order and Ranking Explanation persist across re-ranks.</li>
           <li>Complete and delete; count of items deleted in the last two days.</li>
           <li>Code-level settings (easy to change in source): number of results, alert time, difficulty/urgency levels. Issue data lives in the text file. Re-rank reflects edits; data survives.</li>

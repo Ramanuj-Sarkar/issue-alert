@@ -5,6 +5,7 @@ const express = require("express");
 const crypto = require("crypto");
 const config = require("./config");
 const store = require("./store");
+const ranking = require("./ranking");
 
 const router = express.Router();
 
@@ -74,7 +75,7 @@ function countersFor(history) {
 router.get("/state", (req, res) => {
   const data = store.load();
   res.json({
-    issues: data.issues.filter((issue) => issue.status === "active"),
+    issues: ranking.rank(data.issues, config.dailyCount),
     counters: countersFor(data.history),
     badge: false,
     config: {
@@ -95,8 +96,6 @@ router.post("/issues", (req, res) => {
   const issue = {
     id: crypto.randomUUID(),
     ...value,
-    shownCount: 0,
-    lastShownDate: null,
     manualRank: null,
     status: "active",
     createdAt: new Date().toISOString(),

@@ -15,6 +15,9 @@ const list = document.getElementById("issue-list");
 const emptyState = document.getElementById("empty-state");
 const completedCount = document.getElementById("completed-count");
 const discardedCount = document.getElementById("discarded-count");
+const scrollDown = document.getElementById("scroll-down");
+
+const VISIBLE_ROWS = 6;
 
 function showTab(name) {
   for (const key of Object.keys(tabs)) {
@@ -40,6 +43,15 @@ function showErrors(fields) {
   }
 }
 
+function daysSinceCreated(issue) {
+  if (!issue.createdAt) return 0;
+  const created = new Date(issue.createdAt);
+  const createdDay = new Date(created.getFullYear(), created.getMonth(), created.getDate());
+  const now = new Date();
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  return Math.round((today - createdDay) / (24 * 60 * 60 * 1000));
+}
+
 function renderRow(issue) {
   const row = document.createElement("li");
   row.className = "issue-row";
@@ -47,7 +59,8 @@ function renderRow(issue) {
 
   const count = document.createElement("div");
   count.className = "issue-row__count";
-  count.textContent = issue.shownCount ?? 0;
+  count.textContent = daysSinceCreated(issue);
+  count.title = "Days since you added it";
 
   const main = document.createElement("div");
   main.className = "issue-row__main";
@@ -73,7 +86,12 @@ function render(state) {
   emptyState.hidden = state.issues.length > 0;
   completedCount.textContent = state.counters.completed;
   discardedCount.textContent = state.counters.discarded;
+  scrollDown.hidden = state.issues.length <= VISIBLE_ROWS;
 }
+
+scrollDown.addEventListener("click", () => {
+  list.scrollBy({ top: list.clientHeight, behavior: "smooth" });
+});
 
 async function loadState() {
   const response = await fetch("/api/state");

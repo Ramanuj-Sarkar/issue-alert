@@ -167,6 +167,8 @@ select:focus {
   margin: 0;
   padding: 0;
   border-top: 2px solid var(--ink);
+  max-height: calc(100vh - 18rem);
+  overflow-y: auto;
 }
 
 .issue-row {
@@ -174,8 +176,8 @@ select:focus {
   grid-template-columns: 3rem 1fr auto;
   gap: 1.25rem;
   align-items: center;
-  padding: 1rem 0;
-
+  min-height: calc((100vh - 18rem) / 6);
+  padding: 0.5rem 0;
   border-bottom: 1px solid var(--line);
 }
 
