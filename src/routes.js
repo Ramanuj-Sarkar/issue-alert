@@ -6,6 +6,7 @@ const crypto = require("crypto");
 const config = require("./config");
 const store = require("./store");
 const ranking = require("./ranking");
+const scheduler = require("./scheduler");
 
 const router = express.Router();
 
@@ -74,10 +75,13 @@ function countersFor(history) {
 
 router.get("/state", (req, res) => {
   const data = store.load();
+  if (scheduler.ensureGenerated(data)) {
+    store.save(data);
+  }
   res.json({
     issues: ranking.rank(data.issues, config.dailyCount),
     counters: countersFor(data.history),
-    badge: false,
+    badge: scheduler.isBadgeVisible(data),
     config: {
       dailyCount: config.dailyCount,
       alertTime: config.alertTime,
@@ -85,6 +89,13 @@ router.get("/state", (req, res) => {
       urgencyLevels: config.urgencyLevels,
     },
   });
+});
+
+router.post("/seen", (req, res) => {
+  const data = store.load();
+  data.lastViewedIssuesAt = new Date().toISOString();
+  store.save(data);
+  res.json({ ok: true });
 });
 
 router.post("/issues", (req, res) => {

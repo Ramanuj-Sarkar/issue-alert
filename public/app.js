@@ -16,8 +16,14 @@ const emptyState = document.getElementById("empty-state");
 const completedCount = document.getElementById("completed-count");
 const discardedCount = document.getElementById("discarded-count");
 const scrollDown = document.getElementById("scroll-down");
+const badge = document.getElementById("badge");
 
 const VISIBLE_ROWS = 6;
+
+async function markSeen() {
+  badge.hidden = true;
+  await fetch("/api/seen", { method: "POST" });
+}
 
 function showTab(name) {
   for (const key of Object.keys(tabs)) {
@@ -25,6 +31,7 @@ function showTab(name) {
     tabs[key].classList.toggle("is-active", active);
     panels[key].hidden = !active;
   }
+  if (name === "issues") markSeen();
 }
 
 tabs.input.addEventListener("click", () => showTab("input"));
@@ -87,6 +94,7 @@ function render(state) {
   completedCount.textContent = state.counters.completed;
   discardedCount.textContent = state.counters.discarded;
   scrollDown.hidden = state.issues.length <= VISIBLE_ROWS;
+  badge.hidden = !state.badge;
 }
 
 scrollDown.addEventListener("click", () => {

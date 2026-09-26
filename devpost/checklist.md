@@ -19,7 +19,7 @@ Build mode: learn
   Learner check: Open `http://localhost:3000`, add an issue, and open the Issues tab. Does the row look the way you pictured it — big title, description beneath, the three values on the right?
   Commit: `Scaffold Issue Alert with input form and issue list`
 
-- [ ] **2. The 6 most important issues rise to the top**
+- [x] **2. The 6 most important issues rise to the top**
   Becomes usable: The Issues tab shows up to `dailyCount` (6) active issues in ranked order — days since creation (oldest first), then urgency (High > Medium > Low), then difficulty (High > Medium > Low), then deadline (closest first). Each row's left number is the issue's age in days. Six rows fill the screen; more than six shows a down-arrow and scrolls.
   Why now: This is the unique kernel — the app deciding for you. Settling the comparator before later slices depend on it is cheap.
   PRD ref: `prd.md > The ranked list — Issues tab`, `prd.md > Product Decisions`, `prd.md > States and Boundaries` (fewer than count, more than fits)
@@ -71,7 +71,7 @@ Build mode: learn
 
 ## Hands-on Checkpoints
 
-- [ ] Early usable behavior explored — after slice 2, to confirm the ranking rule before we build on it
+- [x] Early usable behavior explored — after slice 2, to confirm the ranking rule before we build on it
 - [ ] Final kick-the-tires exploration and feedback completed
 
 ## Final Review
