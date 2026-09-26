@@ -2,8 +2,8 @@
 
 A tiny, hackable daily priority list. Your issues live in a plain-text file
 (`data/issues.json`), and every day at noon the app ranks the 6 that matter
-most — hard things first, then imminent deadlines, then urgency — so you stop
-second-guessing yourself.
+most — the ones waiting longest first, then by urgency, then difficulty, then
+the closest deadline — so you stop second-guessing yourself.
 
 ## Run it
 
