@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PRD — Issue Alert</title>
+<style>
+  :root{
+    --ink:#15181c; --muted:#606a75; --line:#e3e7ec; --bg:#f6f7f9; --card:#fff;
+    --blue:#2563b6; --blue-soft:#e8f0fa; --red:#c0392b; --red-soft:#fbeae8;
+    --accent:#2f6f4f; --accent-soft:#e9f2ec; --amber:#8a6d1f; --amber-soft:#f7f0dc;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font:17px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    -webkit-font-smoothing:antialiased}
+  .wrap{max-width:900px;margin:0 auto;padding:48px 24px 80px}
+  .eyebrow{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:700}
+  h1{font-size:40px;line-height:1.12;margin:10px 0 12px;letter-spacing:-.02em}
+  .lede{font-size:19px;color:var(--muted);max-width:64ch;margin:0}
+  .pill{display:inline-block;margin-top:16px;font-size:12px;font-weight:700;color:var(--amber);
+    background:var(--amber-soft);border:1px solid #e7dcb4;border-radius:999px;padding:4px 12px}
+  section{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:26px 28px;margin:18px 0;
+    box-shadow:0 1px 2px rgba(20,30,40,.03)}
+  h2{font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:0 0 16px}
+  h3{font-size:17px;margin:0 0 8px}
+  p{margin:0 0 12px}p:last-child{margin-bottom:0}
+  .diagram svg{width:100%;height:auto;display:block}
+  /* stepper */
+  .stepper{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 18px}
+  .stepper button{all:unset;cursor:pointer;width:30px;height:30px;border-radius:50%;text-align:center;
+    line-height:30px;font-size:13px;font-weight:700;color:var(--muted);background:#eef1f5;border:1px solid var(--line)}
+  .stepper button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+  .stepper button[aria-current="true"]{background:var(--accent);color:#fff;border-color:var(--accent)}
+  .step-panel{display:none;border-left:4px solid var(--accent);padding:4px 0 4px 18px;min-height:70px}
+  .step-panel[data-active="true"]{display:block}
+  .step-panel .no{font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--accent)}
+  .step-panel h3{margin:6px 0 6px}
+  ol.full{margin:0;padding-left:20px;color:var(--muted);font-size:15px}
+  ol.full li{margin:0 0 7px}
+  ol.full li b{color:var(--ink)}
+  .cols{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+  @media(max-width:680px){.cols{grid-template-columns:1fr}}
+  ol.rank{margin:0;padding-left:0;list-style:none;counter-reset:r}
+  ol.rank li{counter-increment:r;position:relative;padding-left:44px;margin:0 0 12px}
+  ol.rank li::before{content:counter(r);position:absolute;left:0;top:0;width:28px;height:28px;border-radius:8px;
+    background:var(--accent-soft);color:var(--accent);font-weight:700;font-size:14px;text-align:center;line-height:28px}
+  .reveal{border:1px solid var(--line);border-radius:12px;margin:10px 0;overflow:hidden}
+  .reveal>button{all:unset;cursor:pointer;display:flex;width:100%;align-items:center;gap:12px;padding:15px 18px;font-weight:600;font-size:16px}
+  .reveal>button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+  .reveal .tag{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:3px 9px;border-radius:999px;
+    background:#eef1f5;color:var(--muted)}
+  .reveal .chev{margin-left:auto;color:var(--muted);transition:transform .18s ease}
+  .reveal[data-open="true"] .chev{transform:rotate(90deg)}
+  .reveal .body{display:none;padding:0 20px 16px 20px}
+  .reveal[data-open="true"] .body{display:block}
+  .reveal .body ul{margin:0;padding-left:18px}
+  .reveal .body li{margin:0 0 7px}
+  /* list-row mock */
+  .rowmock{display:flex;align-items:center;gap:14px;border:1px solid var(--line);border-radius:10px;padding:10px 14px;margin:8px 0;background:#fbfcfd}
+  .rowmock .cnt{font-size:12px;font-weight:700;color:var(--muted);background:#eef1f5;border-radius:6px;padding:3px 7px;min-width:34px;text-align:center}
+  .rowmock .mid{flex:1;min-width:0}
+  .rowmock .t{display:block;font-size:18px;font-weight:700;line-height:1.2}
+  .rowmock .d{display:block;font-size:13px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .rowmock .vals{font-size:12px;color:var(--muted);text-align:right;white-space:nowrap}
+  .counters{display:flex;justify-content:center;align-items:stretch;gap:0;margin:0 0 16px}
+  .counter{flex:1;text-align:center;padding:2px 10px}
+  .counter.left{text-align:right;border-right:2px solid var(--line)}
+  .counter.right{text-align:left}
+  .counter .lab{font-size:12px;font-weight:800;letter-spacing:.06em;text-transform:uppercase}
+  .counter .num{font-size:26px;font-weight:800;line-height:1.15}
+  .counter.done .lab,.counter.done .num{color:var(--blue)}
+  .counter.disc .lab,.counter.disc .num{color:var(--red)}
+  table{width:100%;border-collapse:collapse;font-size:15px}
+  td,th{text-align:left;vertical-align:top;padding:9px 10px;border-bottom:1px solid var(--line)}
+  th{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+  .now li{color:var(--muted)} .now li b{color:var(--ink)}
+  footer{text-align:center;color:var(--muted);font-size:13px;margin-top:30px}
+  code{background:#eef1f5;padding:1px 5px;border-radius:5px;font-size:13px}
+  .note{font-size:14px;color:var(--muted);background:#fbfcfd;border:1px dashed var(--line);border-radius:10px;padding:12px 14px;margin-top:6px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="eyebrow">Issue Alert · Product requirements</div>
+    <h1>Issue Alert</h1>
+    <p class="lede">A personal daily-priority tracker. It stores your issues in a plain-text file and, every day at noon, ranks the 6 it thinks matter most so you stop second-guessing yourself.</p>
+    <span class="pill">status: approved</span>
+  </header>
+
+  <section>
+    <h2>How the pieces connect</h2>
+    <div class="diagram">
+      <svg viewBox="0 0 860 300" role="img" aria-label="Diagram: Input tab adds issues to a plain-text file; a noon ranking turns them into an Issues list of six; you drag to reorder; double-click opens detail where you Complete or Discard; counters and history persist.">
+        <defs>
+          <marker id="a" markerWidth="10" markerHeight="10" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#8a94a1"/></marker>
+          <marker id="ag" markerWidth="10" markerHeight="10" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#2f6f4f"/></marker>
+        </defs>
+        <!-- tabs -->
+        <rect x="20" y="30" width="150" height="42" rx="10" fill="#e9f2ec" stroke="#cfe2d7"/>
+        <text x="95" y="56" text-anchor="middle" font-size="14" font-weight="700" fill="#15181c">Input tab</text>
+        <rect x="20" y="82" width="150" height="42" rx="10" fill="#eef1f5" stroke="#d5dde5"/>
+        <text x="95" y="108" text-anchor="middle" font-size="14" font-weight="700" fill="#15181c">Issues tab</text>
+        <circle cx="158" cy="90" r="9" fill="#c0392b"/>
+        <text x="188" y="95" font-size="11" fill="#c0392b" font-weight="700">badge</text>
+
+        <!-- file -->
+        <rect x="255" y="52" width="180" height="96" rx="12" fill="#fff" stroke="#cfe2d7" stroke-width="2"/>
+        <text x="345" y="78" text-anchor="middle" font-size="13" font-weight="700" fill="#2f6f4f">plain-text file</text>
+        <text x="345" y="99" text-anchor="middle" font-size="11" fill="#606a75">issues + fields</text>
+        <text x="345" y="117" text-anchor="middle" font-size="11" fill="#606a75">manual order</text>
+        <text x="345" y="135" text-anchor="middle" font-size="11" fill="#606a75">ranking explanations</text>
+
+        <!-- noon -->
+        <rect x="515" y="20" width="150" height="60" rx="12" fill="#e8f0fa" stroke="#c9dcf2"/>
+        <text x="590" y="45" text-anchor="middle" font-size="13" font-weight="700" fill="#2563b6">Noon ranking</text>
+        <text x="590" y="64" text-anchor="middle" font-size="10.5" fill="#2563b6">difficulty → deadline → urgency</text>
+
+        <!-- list -->
+        <rect x="515" y="104" width="150" height="86" rx="12" fill="#f4f6f8" stroke="#d5dde5"/>
+        <text x="590" y="130" text-anchor="middle" font-size="13" font-weight="700" fill="#15181c">Issues list</text>
+        <text x="590" y="149" text-anchor="middle" font-size="10.5" fill="#606a75">up to 6 rows</text>
+        <text x="590" y="166" text-anchor="middle" font-size="10.5" fill="#606a75">drag to reorder</text>
+        <text x="590" y="183" text-anchor="middle" font-size="10.5" fill="#606a75">Completed / Discarded</text>
+
+        <!-- detail -->
+        <rect x="715" y="104" width="125" height="86" rx="12" fill="#e9f2ec" stroke="#cfe2d7"/>
+        <text x="777" y="134" text-anchor="middle" font-size="13" font-weight="700" fill="#15181c">Detail</text>
+        <text x="777" y="153" text-anchor="middle" font-size="10.5" fill="#3c5a49">full text + edit</text>
+        <text x="777" y="170" text-anchor="middle" font-size="10.5" fill="#3c5a49">Complete / Discard</text>
+
+        <!-- arrows -->
+        <path d="M170,51 C210,51 220,60 255,72" fill="none" stroke="#2f6f4f" stroke-width="2" marker-end="url(#ag)"/>
+        <path d="M170,103 C210,110 220,110 255,118" fill="none" stroke="#8a94a1" stroke-width="2" marker-end="url(#a)"/>
+        <path d="M435,74 C470,60 480,50 515,50" fill="none" stroke="#8a94a1" stroke-width="2" marker-end="url(#a)"/>
+        <path d="M435,126 C470,130 480,140 515,146" fill="none" stroke="#8a94a1" stroke-width="2" marker-end="url(#a)"/>
+        <path d="M665,147 L715,147" fill="none" stroke="#8a94a1" stroke-width="2" marker-end="url(#a)"/>
+
+        <!-- persistence loop -->
+        <path d="M590,190 C590,250 345,250 345,148" fill="none" stroke="#2f6f4f" stroke-width="2" stroke-dasharray="6 5" marker-end="url(#ag)"/>
+        <text x="470" y="272" text-anchor="middle" font-size="11.5" font-style="italic" fill="#2f6f4f">everything you do persists — the text file is the source of truth</text>
+        <text x="470" y="292" text-anchor="middle" font-size="11" fill="#606a75">settings (count, noon time, levels) live in source code and stay easy to change</text>
+      </svg>
+    </div>
+  </section>
+
+  <section>
+    <h2>The core journey</h2>
+    <div class="stepper" id="stepper" aria-label="Step through the core journey"></div>
+    <div id="panels"></div>
+    <details style="margin-top:16px">
+      <summary style="cursor:pointer;color:var(--muted);font-size:14px">Show all steps as a list</summary>
+      <ol class="full" id="fulllist" style="margin-top:12px"></ol>
+    </details>
+  </section>
+
+  <section>
+    <h2>Where ranking comes from</h2>
+    <ol class="rank">
+      <li><b>Difficulty — hard first.</b> High outranks Medium outranks Low, so the hard things get finished first.</li>
+      <li><b>Deadline within two days — closest first.</b> Any issue due within two days beats one that isn't.</li>
+      <li><b>Urgency — high first.</b> The final tie-breaker.</li>
+    </ol>
+    <p class="note">Drag-to-reorder overrides the automatic order for ties, and your manual placements survive the next noon re-rank. The "why" you read is just the visible values plus the Ranking Explanation you type — the app writes no explanation of its own.</p>
+  </section>
+
+  <section>
+    <h2>What you see, screen by screen</h2>
+
+    <div class="reveal" data-open="true">
+      <button type="button" aria-expanded="true"><span class="tag">Input</span> Add an issue <span class="chev">›</span></button>
+      <div class="body">
+        <ul>
+          <li>Labeled rows (one per line): Title, Description, Urgency, Difficulty, Deadline (optional), Ranking Explanation (optional).</li>
+          <li>Urgency and Difficulty picked from Low / Medium / High; Deadline is <code>YYYY-MM-DD</code> or blank.</li>
+          <li>Bad input (wrong date shape, missing Title) shows a visible error and saves nothing.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="reveal" data-open="true">
+      <button type="button" aria-expanded="true"><span class="tag">Issues</span> The ranked list <span class="chev">›</span></button>
+      <div class="body">
+        <div class="counters">
+          <div class="counter done left"><div class="lab">Completed</div><div class="num">3</div></div>
+          <div class="counter disc right"><div class="lab">Discarded</div><div class="num">1</div></div>
+        </div>
+        <div class="rowmock">
+          <span class="cnt">4d</span>
+          <span class="mid"><span class="t">Finish the tax form</span><span class="d">The accountant emailed the last two documents…</span></span>
+          <span class="vals">High · High · 2026-09-25</span>
+        </div>
+        <div class="rowmock">
+          <span class="cnt">2d</span>
+          <span class="mid"><span class="t">Draft the project one-pager</span><span class="d">Outline the three sections and share with the team…</span></span>
+          <span class="vals">Medium · High · 2026-09-26</span>
+        </div>
+        <ul style="margin-top:12px">
+          <li>Row order: ignored count (left) · title (large) + truncated description (middle) · urgency, difficulty, deadline (right).</li>
+          <li>Counters count the last two days. Six rows fit on screen; raise the count in code and a down-arrow + scroll reveal the rest.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="reveal" data-open="true">
+      <button type="button" aria-expanded="true"><span class="tag">Detail</span> Open, edit, act <span class="chev">›</span></button>
+      <div class="body">
+        <ul>
+          <li>Double-click a row: form-like separate rows, full (untruncated) description and Ranking Explanation, editable; ignored count hidden.</li>
+          <li>X on the left exits back to the list.</li>
+          <li><b>Completed</b> (blue) or <b>Discarded</b> (red) removes the issue, bumps the matching counter, and the next-ranked issue fills the gap.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="reveal" data-open="true">
+      <button type="button" aria-expanded="true"><span class="tag">Noon</span> Daily refresh + badge <span class="chev">›</span></button>
+      <div class="body">
+        <ul>
+          <li>A fresh list of up to 6 is generated at noon; if fewer exist, only those show, packed to the top.</li>
+          <li>If that happened since you last looked, a red badge appears on the Issues tab and clears when you click it.</li>
+          <li>If the app is open at noon, it alerts in-app. No notification while closed.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <div class="cols">
+    <section>
+      <h2>States &amp; boundaries</h2>
+      <table>
+        <tr><th>State</th><th>What happens</th></tr>
+        <tr><td>First use</td><td>Input tab shows; Issues tab empty, counters at zero.</td></tr>
+        <tr><td>Fewer than 6</td><td>Only available issues show, packed to the top; empties aren't drawn.</td></tr>
+        <tr><td>More than fits</td><td>Rows stay sized for six; down-arrow + scroll for the rest.</td></tr>
+        <tr><td>Invalid input</td><td>Visible error; nothing saved.</td></tr>
+        <tr><td>No deadline</td><td>Blank deadline; no deadline boost in ranking.</td></tr>
+        <tr><td>Persistence</td><td>Issues, order, explanations, counters survive restart.</td></tr>
+      </table>
+    </section>
+    <section>
+      <h2>What we're building now</h2>
+      <ul class="now">
+        <li><b>Input tab</b> — six fields, validation.</li>
+        <li><b>Text-file storage</b> — settings in code.</li>
+        <li><b>Noon ranking</b> — difficulty → deadline → urgency.</li>
+        <li><b>Issues list</b> — counters, ranked rows, right-side values.</li>
+        <li><b>Six-fit sizing</b> — scroll + down-arrow when raised.</li>
+        <li><b>Drag-to-reorder</b> — persists across re-ranks.</li>
+        <li><b>Detail/edit view</b> — full text, X to exit.</li>
+        <li><b>Complete / Discard</b> — last-two-day counters.</li>
+        <li><b>Badge + in-app noon alert.</b></li>
+      </ul>
+    </section>
+  </div>
+
+  <section>
+    <h2>Deferred &amp; non-goals</h2>
+    <div class="reveal">
+      <button type="button" aria-expanded="false"><span class="tag">Later</span> On the table someday <span class="chev">›</span></button>
+      <div class="body"><ul>
+        <li>A scheduled notification that fires while the app is closed.</li>
+        <li>Optional polish or theming.</li>
+        <li>More levels or a different daily count — enabled by the code settings.</li>
+      </ul></div>
+    </div>
+    <div class="reveal">
+      <button type="button" aria-expanded="false"><span class="tag">Cut</span> Named, with reasons <span class="chev">›</span></button>
+      <div class="body"><ul>
+        <li><b>Accounts / login / multi-user</b> — a personal tool; no payoff here.</li>
+        <li><b>Cloud storage or a database</b> — would make the data harder to hand-edit.</li>
+        <li><b>Mobile app</b> — a local/desktop app shows the loop.</li>
+        <li><b>Analytics / dashboards / collaboration</b> — resists "add more and more".</li>
+        <li><b>An app-computed explanation sentence</b> — you chose visible values plus your own note.</li>
+      </ul></div>
+    </div>
+    <p class="note"><b>Open question before build:</b> confirm the ranking tier — "deadline within two days" treated as a single tier above everything else. Does not block the technical spec.</p>
+  </section>
+
+  <footer>Markdown stays canonical: <code>devpost/prd.md</code></footer>
+</div>
+
+<script>
+  var steps = [
+    {t:"Open Issue Alert", d:"The Input tab comes up first."},
+    {t:"Fill the form rows", d:"Title, Description, Urgency, Difficulty, optional Deadline, optional Ranking Explanation — with validation on bad values."},
+    {t:"Submit", d:"The issue is saved to the plain-text file."},
+    {t:"Noon list is generated", d:"A fresh ranked list of up to 6 appears; a red badge marks it on the Issues tab if you haven't looked yet."},
+    {t:"Open the Issues tab", d:"The badge clears. Up to 6 issues are ranked and shown, each row: ignored count · title + truncated description · urgency/difficulty/deadline."},
+    {t:"Reorder", d:"Drag rows to break ties; your manual order sticks."},
+    {t:"Open detail", d:"Double-click a row to see the full description and Ranking Explanation, editable, ignored count hidden. X exits."},
+    {t:"Complete or Discard", d:"The issue leaves the list, the matching counter increments, and the next-ranked issue fills the gap."},
+    {t:"Repeat daily", d:"At noon the list re-ranks; manual order and explanations carry over. In-app alert if open."}
+  ];
+  var stepper = document.getElementById('stepper');
+  var panels = document.getElementById('panels');
+  var full = document.getElementById('fulllist');
+  function pad(n){return n<10?'0'+n:''+n}
+  steps.forEach(function(s,i){
+    var b=document.createElement('button');
+    b.type='button'; b.textContent=pad(i+1); b.setAttribute('aria-current', i===0?'true':'false');
+    b.addEventListener('click',function(){select(i)});
+    stepper.appendChild(b);
+    var p=document.createElement('div');
+    p.className='step-panel'; p.setAttribute('data-active', i===0?'true':'false');
+    p.innerHTML='<div class="no">Step '+pad(i+1)+' of '+pad(steps.length)+'</div><h3>'+s.t+'</h3><p>'+s.d+'</p>';
+    panels.appendChild(p);
+    var li=document.createElement('li'); li.innerHTML='<b>'+s.t+'.</b> '+s.d; full.appendChild(li);
+  });
+  function select(i){
+    [].forEach.call(stepper.children,function(b,j){b.setAttribute('aria-current', j===i?'true':'false')});
+    [].forEach.call(panels.children,function(p,j){p.setAttribute('data-active', j===i?'true':'false')});
+  }
+  document.querySelectorAll('.reveal > button').forEach(function(btn){
+    btn.addEventListener('click',function(){
+      var c=btn.parentElement, open=c.getAttribute('data-open')==='true';
+      c.setAttribute('data-open', open?'false':'true');
+      btn.setAttribute('aria-expanded', open?'false':'true');
+    });
+  });
+</script>
+</body>
+</html>

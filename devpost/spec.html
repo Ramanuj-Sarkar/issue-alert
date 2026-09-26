@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Technical Spec — Issue Alert</title>
+<style>
+  :root{
+    --ink:#15181c; --muted:#606a75; --line:#e3e7ec; --bg:#f6f7f9; --card:#fff;
+    --blue:#2563b6; --blue-soft:#e8f0fa; --red:#c0392b; --red-soft:#fbeae8;
+    --green:#2f6f4f; --green-soft:#e9f2ec; --amber:#8a6d1f; --amber-soft:#f7f0dc;
+    --purple:#5b4b8a; --purple-soft:#efeaf7;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font:17px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    -webkit-font-smoothing:antialiased}
+  .wrap{max-width:920px;margin:0 auto;padding:48px 24px 80px}
+  .eyebrow{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:700}
+  h1{font-size:40px;line-height:1.12;margin:10px 0 12px;letter-spacing:-.02em}
+  .lede{font-size:19px;color:var(--muted);max-width:64ch;margin:0}
+  .pill{display:inline-block;margin-top:16px;font-size:12px;font-weight:700;color:var(--amber);
+    background:var(--amber-soft);border:1px solid #e7dcb4;border-radius:999px;padding:4px 12px}
+  section{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:26px 28px;margin:18px 0;
+    box-shadow:0 1px 2px rgba(20,30,40,.03)}
+  h2{font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:0 0 16px}
+  h3{font-size:17px;margin:0 0 8px}
+  p{margin:0 0 12px}p:last-child{margin-bottom:0}
+  .diagram svg{width:100%;height:auto;display:block}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+  @media(max-width:700px){.grid{grid-template-columns:1fr}}
+  .stepper{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 18px}
+  .stepper button{all:unset;cursor:pointer;width:30px;height:30px;border-radius:50%;text-align:center;
+    line-height:30px;font-size:13px;font-weight:700;color:var(--muted);background:#eef1f5;border:1px solid var(--line)}
+  .stepper button:focus-visible{outline:2px solid var(--green);outline-offset:2px}
+  .stepper button[aria-current="true"]{background:var(--green);color:#fff;border-color:var(--green)}
+  .step-panel{display:none;border-left:4px solid var(--green);padding:4px 0 4px 18px;min-height:66px}
+  .step-panel[data-active="true"]{display:block}
+  .step-panel .no{font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--green)}
+  .step-panel h3{margin:6px 0 6px}
+  ol.full{margin:0;padding-left:20px;color:var(--muted);font-size:15px}
+  ol.full li{margin:0 0 7px}
+  ol.full li b{color:var(--ink)}
+  .reveal{border:1px solid var(--line);border-radius:12px;margin:10px 0;overflow:hidden}
+  .reveal>button{all:unset;cursor:pointer;display:flex;width:100%;align-items:center;gap:12px;padding:15px 18px;font-weight:600;font-size:16px}
+  .reveal>button:focus-visible{outline:2px solid var(--green);outline-offset:2px}
+  .reveal .tag{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:3px 9px;border-radius:999px;background:#eef1f5;color:var(--muted)}
+  .reveal .chev{margin-left:auto;color:var(--muted);transition:transform .18s ease}
+  .reveal[data-open="true"] .chev{transform:rotate(90deg)}
+  .reveal .body{display:none;padding:0 20px 16px 20px}
+  .reveal[data-open="true"] .body{display:block}
+  .reveal .body ul{margin:0;padding-left:18px}
+  .reveal .body li{margin:0 0 7px}
+  .filetag{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px;background:#eef1f5;padding:2px 7px;border-radius:6px}
+  pre{background:#11161c;color:#d8e0e8;border-radius:12px;padding:16px 18px;overflow:auto;font-size:13px;line-height:1.55;margin:0}
+  pre .c{color:#7f9a86}
+  table{width:100%;border-collapse:collapse;font-size:15px}
+  td,th{text-align:left;vertical-align:top;padding:9px 10px;border-bottom:1px solid var(--line)}
+  th{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+  .fail li{margin:0 0 8px}
+  .fail b{color:var(--red)}
+  .note{font-size:14px;color:var(--muted);background:#fbfcfd;border:1px dashed var(--line);border-radius:10px;padding:12px 14px;margin-top:14px}
+  footer{text-align:center;color:var(--muted);font-size:13px;margin-top:30px}
+  code{background:#eef1f5;padding:1px 5px;border-radius:5px;font-size:13px}
+  ul.clean{margin:0;padding-left:18px} ul.clean li{margin:0 0 8px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="eyebrow">Issue Alert · Technical spec</div>
+    <h1>Technical Spec</h1>
+    <p class="lede">The blueprint: a tiny Node/Express program serves a plain two-tab page, stores everything in one hand-editable JSON file, and checks the clock when you open it.</p>
+    <span class="pill">status: approved</span>
+  </header>
+
+  <section>
+    <h2>How this works, in plain language</h2>
+    <p>Four things, and that's the whole system:</p>
+    <ul class="clean">
+      <li><b>A page you see</b> — two tabs, Input and Issues, drawn by plain HTML/CSS/JS files you can open and read.</li>
+      <li><b>A small program that serves it</b> — Node.js + Express answers <code>localhost:3000</code> and handles small requests ("give me the issues", "save this").</li>
+      <li><b>A text file that holds everything</b> — <span class="filetag">data/issues.json</span>. Issues, shown-counts, manual order, and history are all plain JSON you can edit by hand.</li>
+      <li><b>A clock check, not a background service</b> — open after noon and the program builds today's list if it hasn't; if the app is open at noon, the page asks for the same.</li>
+    </ul>
+    <p class="note">Why this shape: a browser page can't write your file on its own, and an always-running scheduler adds parts that are hard to debug. One local program + an on-open check keeps it to one command, one file, no accounts, no cloud.</p>
+  </section>
+
+  <section>
+    <h2>Architecture at a glance</h2>
+    <div class="diagram">
+      <svg viewBox="0 0 880 330" role="img" aria-label="Diagram: the browser page talks to a local Express program; the program reads and writes data/issues.json; a clock check in the program builds the noon list; history and order are stored in the same file.">
+        <defs>
+          <marker id="a" markerWidth="10" markerHeight="10" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#8a94a1"/></marker>
+          <marker id="g" markerWidth="10" markerHeight="10" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#2f6f4f"/></marker>
+        </defs>
+
+        <rect x="24" y="90" width="230" height="140" rx="14" fill="#eef1f5" stroke="#d5dde5"/>
+        <text x="139" y="118" text-anchor="middle" font-size="15" font-weight="700">Browser page</text>
+        <text x="139" y="140" text-anchor="middle" font-size="11.5" fill="#606a75">Input tab · Issues tab</text>
+        <text x="139" y="160" text-anchor="middle" font-size="11.5" fill="#606a75">drag · detail · counters · badge</text>
+        <text x="139" y="182" text-anchor="middle" font-size="11.5" fill="#606a75">noon timer while open</text>
+        <text x="139" y="206" text-anchor="middle" font-size="11" font-family="ui-monospace,Menlo" fill="#606a75">public/index.html · app.js · styles.css</text>
+
+        <rect x="330" y="70" width="230" height="180" rx="14" fill="#e9f2ec" stroke="#cfe2d7"/>
+        <text x="445" y="98" text-anchor="middle" font-size="15" font-weight="700" fill="#15181c">Local program</text>
+        <text x="445" y="119" text-anchor="middle" font-size="11.5" fill="#3c5a49">Node.js + Express</text>
+        <line x1="356" y1="132" x2="534" y2="132" stroke="#cfe2d7"/>
+        <text x="445" y="154" text-anchor="middle" font-size="11.5" fill="#3c5a49">ranking · manual order</text>
+        <text x="445" y="175" text-anchor="middle" font-size="11.5" fill="#3c5a49">on-open noon check</text>
+        <text x="445" y="196" text-anchor="middle" font-size="11.5" fill="#3c5a49">validate · save</text>
+        <text x="445" y="222" text-anchor="middle" font-size="11" font-family="ui-monospace,Menlo" fill="#3c5a49">server.js · src/*</text>
+
+        <rect x="640" y="82" width="216" height="156" rx="14" fill="#fff" stroke="#d5dde5" stroke-width="2"/>
+        <text x="748" y="110" text-anchor="middle" font-size="15" font-weight="700" fill="#5b4b8a">issues.json</text>
+        <line x1="666" y1="124" x2="830" y2="124" stroke="#e3e7ec"/>
+        <text x="748" y="146" text-anchor="middle" font-size="11.5" fill="#606a75">issues + fields</text>
+        <text x="748" y="167" text-anchor="middle" font-size="11.5" fill="#606a75">shownCount · manualRank</text>
+        <text x="748" y="188" text-anchor="middle" font-size="11.5" fill="#606a75">history (done/discarded)</text>
+        <text x="748" y="209" text-anchor="middle" font-size="11.5" fill="#606a75">lastGenerated · lastViewed</text>
+        <text x="748" y="229" text-anchor="middle" font-size="11" font-style="italic" fill="#5b4b8a">hand-editable</text>
+
+        <path d="M254,140 C290,140 300,140 330,140" fill="none" stroke="#8a94a1" stroke-width="2" marker-end="url(#a)"/>
+        <path d="M330,190 C300,190 290,190 254,190" fill="none" stroke="#8a94a1" stroke-width="2" marker-end="url(#a)"/>
+        <text x="292" y="132" text-anchor="middle" font-size="10.5" fill="#606a75">requests</text>
+        <text x="292" y="207" text-anchor="middle" font-size="10.5" fill="#606a75">page</text>
+
+        <path d="M560,130 C600,130 610,130 640,130" fill="none" stroke="#2f6f4f" stroke-width="2" marker-end="url(#g)"/>
+        <path d="M640,190 C610,190 600,190 560,190" fill="none" stroke="#2f6f4f" stroke-width="2" marker-end="url(#g)"/>
+        <text x="600" y="122" text-anchor="middle" font-size="10.5" fill="#2f6f4f">read/write</text>
+        <text x="600" y="210" text-anchor="middle" font-size="10.5" fill="#2f6f4f">data</text>
+
+        <text x="445" y="292" text-anchor="middle" font-size="12" font-style="italic" fill="#2f6f4f">one command to start · one file to hold everything · no cloud, accounts, or database</text>
+        <text x="139" y="270" text-anchor="middle" font-size="11" fill="#606a75">you can swap your own JSON in and refresh</text>
+      </svg>
+    </div>
+  </section>
+
+  <section>
+    <h2>The core journey through the system</h2>
+    <div class="stepper" id="stepper" aria-label="Step through the journey"></div>
+    <div id="panels"></div>
+    <details style="margin-top:16px">
+      <summary style="cursor:pointer;color:var(--muted);font-size:14px">Show all steps as a list</summary>
+      <ol class="full" id="fulllist" style="margin-top:12px"></ol>
+    </details>
+  </section>
+
+  <section>
+    <h2>Components</h2>
+    <p style="color:var(--muted);font-size:15px">Each piece has one job and its own file. <code>5-build</code> builds them in this order.</p>
+
+    <div class="reveal" data-open="true">
+      <button type="button" aria-expanded="true"><span class="tag">File</span> <span class="filetag">server.js</span> — the server <span class="chev">›</span></button>
+      <div class="body"><ul>
+        <li>Serves <code>public/</code> and mounts the API.</li>
+        <li>Knows nothing about ranking or storage; delegates.</li>
+        <li>PRD: <code>Screens and Layout</code>.</li>
+      </ul></div>
+    </div>
+    <div class="reveal" data-open="true">
+      <button type="button" aria-expanded="true"><span class="tag">File</span> <span class="filetag">src/store.js</span> — the data store <span class="chev">›</span></button>
+      <div class="body"><ul>
+        <li>The only code that touches <code>data/issues.json</code>.</li>
+        <li>Creates an empty file if missing; refuses to overwrite a malformed one.</li>
+        <li>PRD: <code>States and Boundaries</code> (persistence).</li>
+      </ul></div>
+    </div>
+    <div class="reveal" data-open="true">
+      <button type="button" aria-expanded="true"><span class="tag">File</span> <span class="filetag">src/ranking.js</span> — ranking <span class="chev">›</span></button>
+      <div class="body"><ul>
+        <li>Sorts: difficulty (hard first) → deadline within two days (closest first) → urgency (high first).</li>
+        <li>Applies manual order: dragged issues keep their spot, the rest sort around them.</li>
+        <li>PRD: <code>The ranked list — Issues tab</code>, <code>Manual ordering</code>.</li>
+      </ul></div>
+    </div>
+    <div class="reveal" data-open="true">
+      <button type="button" aria-expanded="true"><span class="tag">File</span> <span class="filetag">src/scheduler.js</span> — the noon check <span class="chev">›</span></button>
+      <div class="body"><ul>
+        <li>On each list request: if it's at/after <code>alertTime</code> and today's list isn't made, make it.</li>
+        <li>Marks the date and adds 1 to each appearing issue's <code>shownCount</code> — once per day.</li>
+        <li>PRD: <code>The noon list and alert</code>.</li>
+      </ul></div>
+    </div>
+    <div class="reveal" data-open="true">
+      <button type="button" aria-expanded="true"><span class="tag">File</span> <span class="filetag">src/routes.js</span> — the API <span class="chev">›</span></button>
+      <div class="body"><ul>
+        <li>GET state · POST issue · PUT issue · complete · discard · order · seen.</li>
+        <li>PRD: <code>Features and Behavior</code>.</li>
+      </ul></div>
+    </div>
+    <div class="reveal" data-open="true">
+      <button type="button" aria-expanded="true"><span class="tag">Files</span> <span class="filetag">public/*</span> — the page <span class="chev">›</span></button>
+      <div class="body"><ul>
+        <li>Tabs, form + validation, list, drag, detail/edit, counters, badge, noon timer.</li>
+        <li>PRD: <code>Screens and Layout</code>, <code>Adding an issue</code>, <code>Detail and edit mode</code>, <code>Completing and discarding</code>.</li>
+      </ul></div>
+    </div>
+    <div class="reveal" data-open="true">
+      <button type="button" aria-expanded="true"><span class="tag">File</span> <span class="filetag">src/config.js</span> — settings in code <span class="chev">›</span></button>
+      <div class="body"><ul>
+        <li><code>dailyCount</code> (6), <code>alertTime</code> ("12:00"), difficulty/urgency levels.</li>
+        <li>Change here, restart, behavior changes — per PRD <code>Product Decisions</code>.</li>
+      </ul></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Data model — one file</h2>
+    <pre>{
+  "issues": [
+    {
+      "id": "8f2c…",
+      "title": "Finish the tax form",
+      "description": "The accountant emailed…",
+      "urgency": "High",
+      "difficulty": "High",
+      "deadline": "2026-09-25",
+      "rankingExplanation": "Must be filed before Friday.",
+      "shownCount": 4,            <span class="c"># times it appeared, undone</span>
+      "lastShownDate": "2026-09-24",
+      "manualRank": null,         <span class="c"># set when you drag it</span>
+      "status": "active",
+      "createdAt": "2026-09-20T09:00:00.000Z"
+    }
+  ],
+  "history": [ { "id": "8f2c…", "outcome": "completed", "at": "…" } ],
+  "lastGeneratedDate": "2026-09-24",
+  "lastViewedIssuesAt": "2026-09-24T09:00:00.000Z"
+}</pre>
+    <table style="margin-top:16px">
+      <tr><th>Data</th><th>Where it lives · what happens on return</th></tr>
+      <tr><td>Issues + fields</td><td>In <code>issues[]</code>; re-read from the file on every load, so hand-edits show after refresh.</td></tr>
+      <tr><td>Manual order</td><td><code>manualRank</code> per issue; lets a dragged position survive the next re-rank.</td></tr>
+      <tr><td>Shown count</td><td><code>shownCount</code> + <code>lastShownDate</code>; +1 once per day an issue is on the list.</td></tr>
+      <tr><td>Counters</td><td>Computed from <code>history[]</code> — completed/discarded in the last two days.</td></tr>
+      <tr><td>Badge</td><td><code>lastGeneratedDate</code> vs <code>lastViewedIssuesAt</code>.</td></tr>
+    </table>
+    <p class="note">Nothing is stored in the browser. The file is the source of truth, so nothing gets stranded in the page.</p>
+  </section>
+
+  <div class="grid">
+    <section>
+      <h2>File structure</h2>
+      <pre>issue-alert/
+├── server.js        <span class="c"># Express + static</span>
+├── src/
+│   ├── config.js    <span class="c"># count, noon, levels</span>
+│   ├── store.js     <span class="c"># read/write the file</span>
+│   ├── ranking.js   <span class="c"># sort + manual order</span>
+│   ├── scheduler.js <span class="c"># noon check</span>
+│   └── routes.js    <span class="c"># API</span>
+├── public/
+│   ├── index.html   <span class="c"># two tabs</span>
+│   ├── styles.css   <span class="c"># light mode</span>
+│   └── app.js       <span class="c"># behavior</span>
+├── data/
+│   └── issues.json  <span class="c"># created on first run</span>
+├── package.json
+├── README.md
+└── devpost/         <span class="c"># learning docs</span></pre>
+    </section>
+    <section>
+      <h2>Stack &amp; dependencies</h2>
+      <ul class="clean">
+        <li><b>Node.js v18+</b> (v24 installed).</li>
+        <li><b>Express</b> — the only runtime dependency. <a href="https://expressjs.com">expressjs.com</a>. Free, no key.</li>
+        <li><b>Built-ins</b> — <code>fs</code>, <code>crypto.randomUUID()</code>.</li>
+        <li><b>No</b> database, hosting, APIs, accounts, keys, or cost.</li>
+      </ul>
+      <p class="note"><b>Start:</b> <code>npm install</code> → <code>npm start</code> → open <code>http://localhost:3000</code>. <b>Demo:</b> add an issue, show the list and counters, drag one, complete one, edit <code>data/issues.json</code>, refresh, show it changed. No deployment.</p>
+    </section>
+  </div>
+
+  <section>
+    <h2>Where it will realistically break</h2>
+    <ul class="fail">
+      <li><b>issues.json is missing</b> → the program creates an empty one; first run just works.</li>
+      <li><b>issues.json is malformed</b> (a hand-edit broke the JSON) → it will not overwrite it; you get a plain message naming the file and the parse error so you can fix it.</li>
+      <li><b>Invalid input</b> on the Input tab → a field-level error; nothing is saved.</li>
+      <li><b>Never opened for days</b> → those days don't advance the shown-count; the next open makes one list for that day (agreed behavior).</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>What was simplified, and why</h2>
+    <ul class="clean">
+      <li><b>On-open check</b> instead of a background scheduler — same visible behavior, no daemon to debug.</li>
+      <li><b>One JSON file</b> instead of a database — keeps the data hand-editable (the kernel).</li>
+      <li><b>No framework or build step</b> — keeps every file readable and directly editable.</li>
+      <li><b>Native drag-and-drop</b> instead of a library — one feature, well supported, no dependency.</li>
+      <li><b>Local-only, no deployment</b> — the demo is a video + repo; hosting proves nothing extra.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>Decisions &amp; open issues</h2>
+    <p><b>Your choices:</b></p>
+    <ul class="clean">
+      <li>Node + Express + plain HTML/CSS/JS, local-only — one language, no build step, hand-editable. Tradeoff: more manual wiring.</li>
+      <li>JSON file storage — structured and standard. Tradeoff: malformed JSON needs graceful handling.</li>
+      <li>Settings in code, issues in the file.</li>
+      <li>On-open noon check, not a background service.</li>
+    </ul>
+    <p style="margin-top:14px"><b>Uncertainty discussed:</b> how "noon" works without a background process — clarified by the on-open check. <b>Verify in build:</b> open after noon on a fresh date and confirm exactly one generation (counts +1 once; reopening doesn't double-count).</p>
+    <div class="note">
+      <b>Open issues:</b>
+      <ul style="margin:8px 0 0">
+        <li>From the PRD: confirm the "deadline within two days" tier — spec-independent; try it and adjust <code>ranking.js</code> if it feels wrong.</li>
+        <li>The manual-order rule is the subtlest behavior — build and verify it first, before the rest of the list features.</li>
+      </ul>
+    </div>
+  </section>
+
+  <footer>Markdown stays canonical: <code>devpost/spec.md</code></footer>
+</div>
+
+<script>
+  var steps = [
+    {t:"Start the program", d:"npm start serves the page; you open localhost:3000 in your browser."},
+    {t:"Add an issue (Input)", d:"The page sends the fields to the program, which validates and writes them into data/issues.json."},
+    {t:"The noon list is built", d:"On the first request at/after noon today, the program ranks issues and adds 1 to each one's shown-count."},
+    {t:"Open Issues", d:"Up to six ranked rows appear; the red badge (a list was made since you last looked) clears. Counters come from history."},
+    {t:"Drag a row", d:"The new order is sent and stored in manualRank, so it survives the next re-rank."},
+    {t:"Open detail (double-click)", d:"Full description and Ranking Explanation; edits save back to the file. X exits."},
+    {t:"Complete or Discard", d:"An entry is appended to history; the issue leaves the active list; the next-ranked fills the slot."},
+    {t:"Open at noon", d:"The page's timer triggers the same generation and the in-app alert."}
+  ];
+  var stepper=document.getElementById('stepper'), panels=document.getElementById('panels'), full=document.getElementById('fulllist');
+  function pad(n){return n<10?'0'+n:''+n}
+  steps.forEach(function(s,i){
+    var b=document.createElement('button'); b.type='button'; b.textContent=pad(i+1);
+    b.setAttribute('aria-current', i===0?'true':'false');
+    b.addEventListener('click',function(){select(i)}); stepper.appendChild(b);
+    var p=document.createElement('div'); p.className='step-panel'; p.setAttribute('data-active', i===0?'true':'false');
+    p.innerHTML='<div class="no">Step '+pad(i+1)+' of '+pad(steps.length)+'</div><h3>'+s.t+'</h3><p>'+s.d+'</p>';
+    panels.appendChild(p);
+    var li=document.createElement('li'); li.innerHTML='<b>'+s.t+'.</b> '+s.d; full.appendChild(li);
+  });
+  function select(i){
+    [].forEach.call(stepper.children,function(b,j){b.setAttribute('aria-current', j===i?'true':'false')});
+    [].forEach.call(panels.children,function(p,j){p.setAttribute('data-active', j===i?'true':'false')});
+  }
+  document.querySelectorAll('.reveal > button').forEach(function(btn){
+    btn.addEventListener('click',function(){
+      var c=btn.parentElement, open=c.getAttribute('data-open')==='true';
+      c.setAttribute('data-open', open?'false':'true'); btn.setAttribute('aria-expanded', open?'false':'true');
+    });
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,16 @@
+{
+  "name": "issue-alert",
+  "version": "1.0.0",
+  "private": true,
+  "description": "A tiny, hackable daily priority list: issues live in a plain-text file and every day at noon it ranks the 6 that matter most.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "express": "^5.2.1"
+  }
+}

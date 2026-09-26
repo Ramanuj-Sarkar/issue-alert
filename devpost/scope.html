@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Scope — Noon Six</title>
+<style>
+  :root{
+    --ink:#151a21; --muted:#5c6672; --line:#e2e6ec; --bg:#f6f7f9;
+    --card:#ffffff; --accent:#2f6f4f; --accent-soft:#e8f1ec;
+    --warn:#8a6d1f; --warn-soft:#f7f0dc; --cut:#9a3b3b; --cut-soft:#f6e7e7;
+    --later:#3d5a80; --later-soft:#e8eef6;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font:16px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:880px; margin:0 auto; padding:48px 24px 80px}
+  header.top{margin-bottom:36px}
+  .eyebrow{font-size:12px; letter-spacing:.14em; text-transform:uppercase; color:var(--muted); font-weight:600}
+  h1{font-size:38px; line-height:1.15; margin:10px 0 12px; letter-spacing:-.02em}
+  .lede{font-size:19px; color:var(--muted); max-width:62ch; margin:0}
+  .pill{display:inline-block; margin-top:16px; font-size:12px; font-weight:600; color:var(--accent);
+    background:var(--accent-soft); border:1px solid #cfe2d7; border-radius:999px; padding:4px 12px}
+  section{background:var(--card); border:1px solid var(--line); border-radius:16px; padding:26px 28px; margin:18px 0;
+    box-shadow:0 1px 2px rgba(20,30,40,.03)}
+  h2{font-size:13px; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); margin:0 0 14px}
+  h3{font-size:17px; margin:0 0 6px}
+  p{margin:0 0 12px}
+  p:last-child{margin-bottom:0}
+  .kernel{border-left:4px solid var(--accent)}
+  .kernel .big{font-size:20px; line-height:1.5}
+  .grid{display:grid; grid-template-columns:1fr 1fr; gap:24px}
+  @media(max-width:640px){.grid{grid-template-columns:1fr}}
+  ul.clean{margin:0; padding-left:18px}
+  ul.clean li{margin:0 0 8px}
+  .quiet{color:var(--muted); font-size:14px}
+  .diagram{margin:6px 0 4px}
+  .diagram svg{width:100%; height:auto; display:block}
+  .legend{display:flex; gap:18px; flex-wrap:wrap; margin-top:14px; font-size:13px; color:var(--muted)}
+  .legend span{display:flex; align-items:center; gap:7px}
+  .dot{width:10px; height:10px; border-radius:50%}
+  .reveal{border:1px solid var(--line); border-radius:12px; margin:10px 0; overflow:hidden}
+  .reveal>button{
+    all:unset; cursor:pointer; display:flex; width:100%; align-items:center; gap:12px;
+    padding:14px 18px; font-weight:600; font-size:15px;
+  }
+  .reveal>button:focus-visible{outline:2px solid var(--accent); outline-offset:2px}
+  .reveal .tag{font-size:11px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; padding:3px 9px; border-radius:999px}
+  .reveal .chev{margin-left:auto; color:var(--muted); transition:transform .18s ease}
+  .reveal[data-open="true"] .chev{transform:rotate(90deg)}
+  .reveal .body{display:none; padding:0 18px 16px 18px; color:var(--ink)}
+  .reveal[data-open="true"] .body{display:block}
+  .reveal .body ul{margin:0; padding-left:18px}
+  .reveal .body li{margin:0 0 7px}
+  .now .tag{background:var(--accent-soft); color:var(--accent)}
+  .later .tag{background:var(--later-soft); color:var(--later)}
+  .cut .tag{background:var(--cut-soft); color:var(--cut)}
+  .now{border-color:#cfe2d7}
+  .beat{background:#fbfdfc; border:1px dashed #c9dcd2; border-radius:12px; padding:16px 18px; margin-top:14px}
+  .beat strong{color:var(--accent)}
+  footer{text-align:center; color:var(--muted); font-size:13px; margin-top:30px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="eyebrow">Scope · Proof of concept</div>
+    <h1>Noon Six <span class="quiet" style="font-size:16px; font-weight:400">(working title)</span></h1>
+    <p class="lede">A tiny, hackable daily priority list. It stores your issues in plain text, and every day at noon it confronts you with the 6 it thinks matter most — and tells you why.</p>
+    <span class="pill">status: approved</span>
+  </header>
+
+  <section class="kernel">
+    <h2>The unique kernel</h2>
+    <p class="big">Most to-do apps store tasks and wait for you to decide. This one makes the decision <em>for</em> you — and then shows its work.</p>
+    <p>At noon it ranks your issues (hard first, then imminent deadlines, then urgency), explains why each landed where it did, and quietly counts how many days an issue has shown up without getting done. The point isn't an organized list — it's trusting a decision so you stop second-guessing yourself. The accountability layer ("you've been ignoring this one") is what makes it more than a generic list.</p>
+  </section>
+
+  <section>
+    <h2>How it works</h2>
+    <div class="diagram">
+      <svg viewBox="0 0 820 250" role="img" aria-label="Diagram: You add issues, the app ranks them at noon and shows reasons, you act on the list, it remembers.">
+        <defs>
+          <marker id="arrow" markerWidth="10" markerHeight="10" refX="7" refY="3" orient="auto">
+            <path d="M0,0 L7,3 L0,6 Z" fill="#8a94a1"/>
+          </marker>
+          <marker id="arrowAccent" markerWidth="10" markerHeight="10" refX="7" refY="3" orient="auto">
+            <path d="M0,0 L7,3 L0,6 Z" fill="#2f6f4f"/>
+          </marker>
+        </defs>
+        <rect x="18" y="86" width="176" height="80" rx="14" fill="#eef2f6" stroke="#d5dde5"/>
+        <text x="106" y="118" text-anchor="middle" font-size="15" font-weight="700" fill="#151a21">You</text>
+        <text x="106" y="140" text-anchor="middle" font-size="12" fill="#5c6672">add issues as they</text>
+        <text x="106" y="156" text-anchor="middle" font-size="12" fill="#5c6672">come to mind</text>
+
+        <rect x="300" y="30" width="220" height="192" rx="14" fill="#e8f1ec" stroke="#cfe2d7"/>
+        <text x="410" y="60" text-anchor="middle" font-size="15" font-weight="700" fill="#151a21">Noon ranking</text>
+        <text x="410" y="86" text-anchor="middle" font-size="12" fill="#3c5a49">1 · difficulty (hard first)</text>
+        <text x="410" y="107" text-anchor="middle" font-size="12" fill="#3c5a49">2 · deadline ≤ 2 days</text>
+        <text x="410" y="128" text-anchor="middle" font-size="12" fill="#3c5a49">3 · urgency</text>
+        <line x1="332" y1="146" x2="488" y2="146" stroke="#cfe2d7"/>
+        <text x="410" y="170" text-anchor="middle" font-size="12" fill="#3c5a49">+ why each one ranked</text>
+        <text x="410" y="190" text-anchor="middle" font-size="12" fill="#3c5a49">+ days shown, undone</text>
+        <text x="410" y="210" text-anchor="middle" font-size="12" fill="#3c5a49">= 6 issues</text>
+
+        <rect x="626" y="86" width="176" height="80" rx="14" fill="#eef2f6" stroke="#d5dde5"/>
+        <text x="714" y="118" text-anchor="middle" font-size="15" font-weight="700" fill="#151a21">You act</text>
+        <text x="714" y="140" text-anchor="middle" font-size="12" fill="#5c6672">reorder, work,</text>
+        <text x="714" y="156" text-anchor="middle" font-size="12" fill="#5c6672">complete, delete</text>
+
+        <path d="M194,126 C240,126 260,126 300,126" fill="none" stroke="#8a94a1" stroke-width="2" marker-end="url(#arrow)"/>
+        <path d="M520,126 C566,126 586,126 626,126" fill="none" stroke="#8a94a1" stroke-width="2" marker-end="url(#arrow)"/>
+        <path d="M714,166 C714,224 106,224 106,166" fill="none" stroke="#2f6f4f" stroke-width="2" stroke-dasharray="6 5" marker-end="url(#arrowAccent)"/>
+        <text x="410" y="243" text-anchor="middle" font-size="12" font-style="italic" fill="#2f6f4f">plain-text file: your issues, settings, and history stay hand-editable</text>
+      </svg>
+    </div>
+    <div class="legend">
+      <span><span class="dot" style="background:#8a94a1"></span> daily loop</span>
+      <span><span class="dot" style="background:#2f6f4f"></span> everything lives in one editable text file</span>
+    </div>
+  </section>
+
+  <div class="grid">
+    <section>
+      <h2>Who it's for</h2>
+      <p>You, personally — someone who finds it hard to decide what to work on and tends to second-guess priorities, and who wants a daily nudge that feels like confidence rather than another pile of tasks. Others <em>could</em> use it, but they aren't the target.</p>
+      <p class="quiet">Hackathon audience: a reviewer who should get, in about a minute, that the whole thing is meant to be opened up and edited.</p>
+    </section>
+    <section>
+      <h2>Why it matters</h2>
+      <p>Prioritizing has always been hard, and second-guessing gets in the way. You picture this app and "feel more confident and ready to get stuff done." You also want to <em>understand</em> what you make — to edit and grow it yourself — and to get real daily use from something you built.</p>
+    </section>
+  </div>
+
+  <section>
+    <h2>The core loop</h2>
+    <ul class="clean">
+      <li>Add issues: title, description, difficulty (L/M/H), urgency (L/M/H), optional deadline, and an optional free-text <strong>Ranking Explanation</strong> — your own reason it matters, is hard, or is necessary.</li>
+      <li>Open it at/after noon — today's 6 are waiting, each with <strong>why</strong> it ranked there and how often it has come up undone.</li>
+      <li>Reorder by hand to break ties; your manual order and explanation <strong>survive the next noon re-rank</strong>.</li>
+      <li>Finish one, delete it — a count of what you deleted in the last two days sits above the list.</li>
+      <li>Come back tomorrow, because the list tells you what to do and remembers what you've been dodging.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>What "working" looks like</h2>
+    <p>Open the app at/after noon: 6 issues ranked and waiting, each with a short reason and an ignored-count. Add, complete, delete. Then the proving moment — add a Ranking Explanation and drag an issue to a new spot, let the next noon re-rank run, and confirm your order and explanation are still there while the automatic ranking updated around them. Edit an issue in the text file, change a code-level value (count, noon time), reload: the list reflects it and nothing you'd saved is lost.</p>
+    <div class="beat"><strong>The "oh, that's cool" beat:</strong> editing a plain text file changes how the app behaves, and everything already saved stays intact.</div>
+  </section>
+
+  <section>
+    <h2>Now / Later / Cut</h2>
+
+    <div class="reveal now" data-open="true">
+      <button type="button" aria-expanded="true">
+        <span class="tag">Now</span> The proof of concept
+        <span class="chev">›</span>
+      </button>
+      <div class="body">
+        <ul>
+          <li>Local app; issues stored in a human-editable text file (no cloud, no database, no accounts).</li>
+          <li>Issues with title, description, difficulty, urgency, optional deadline, and an optional Ranking Explanation.</li>
+          <li>Top-6 daily list ranked: difficulty (hard first) → deadline ≤ 2 days (closer first) → urgency.</li>
+          <li>A visible reason per rank, plus a "shown up without being completed" count.</li>
+          <li>Manual reorder as a tie-breaker; the manual order and Ranking Explanation persist across re-ranks.</li>
+          <li>Complete and delete; count of items deleted in the last two days.</li>
+          <li>Code-level settings (easy to change in source): number of results, alert time, difficulty/urgency levels. Issue data lives in the text file. Re-rank reflects edits; data survives.</li>
+          <li>In-app alert at noon only (no background notification).</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="reveal later">
+      <button type="button" aria-expanded="false">
+        <span class="tag">Later</span> Worth doing, not now
+        <span class="chev">›</span>
+      </button>
+      <div class="body">
+        <ul>
+          <li>A true scheduled notification that fires while the app is closed.</li>
+          <li>Making it visibly nicer / more polished.</li>
+          <li>Syncing or backing up beyond the local text file.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="reveal cut">
+      <button type="button" aria-expanded="false">
+        <span class="tag">Cut</span> Named, with reasons
+        <span class="chev">›</span>
+      </button>
+      <div class="body">
+        <ul>
+          <li><strong>Accounts, login, multi-user</strong> — a personal tool; cost and complexity with no payoff here.</li>
+          <li><strong>Cloud storage or a database</strong> — would make the data harder to hand-edit, the opposite of the point.</li>
+          <li><strong>Mobile app</strong> — a desktop/local app demonstrates the loop fine.</li>
+          <li><strong>Notifications while closed</strong> — deferred (see Later); opening at noon keeps the build small.</li>
+          <li><strong>Analytics, dashboards, collaboration</strong> — the wish to "add more and more" is exactly what a proof of concept is meant to resist.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <footer>Markdown stays canonical: <code>devpost/scope.md</code></footer>
+</div>
+
+<script>
+  document.querySelectorAll('.reveal > button').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var card = btn.parentElement;
+      var open = card.getAttribute('data-open') === 'true';
+      card.setAttribute('data-open', open ? 'false' : 'true');
+      btn.setAttribute('aria-expanded', open ? 'false' : 'true');
+    });
+  });
+</script>
+</body>
+</html>

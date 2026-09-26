@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Issue Alert</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <header class="tabs">
+      <button type="button" id="tab-input" class="tab is-active" data-tab="input">
+        Input
+      </button>
+      <button type="button" id="tab-issues" class="tab" data-tab="issues">
+        Issues
+        <span id="badge" class="badge" hidden></span>
+      </button>
+    </header>
+
+    <main class="stage">
+      <section id="panel-input" class="panel">
+        <form id="issue-form" novalidate>
+          <div class="field">
+            <label for="title">Title</label>
+            <input id="title" name="title" type="text" autocomplete="off" />
+            <p class="error" data-error-for="title"></p>
+          </div>
+
+          <div class="field">
+            <label for="description">Description</label>
+            <textarea id="description" name="description" rows="2"></textarea>
+            <p class="error" data-error-for="description"></p>
+          </div>
+
+          <div class="field">
+            <label for="urgency">Urgency</label>
+            <select id="urgency" name="urgency">
+              <option value="Low">Low</option>
+              <option value="Medium" selected>Medium</option>
+              <option value="High">High</option>
+            </select>
+            <p class="error" data-error-for="urgency"></p>
+          </div>
+
+          <div class="field">
+            <label for="difficulty">Difficulty</label>
+            <select id="difficulty" name="difficulty">
+              <option value="Low">Low</option>
+              <option value="Medium" selected>Medium</option>
+              <option value="High">High</option>
+            </select>
+            <p class="error" data-error-for="difficulty"></p>
+          </div>
+
+          <div class="field">
+            <label for="deadline">Deadline <span class="hint">optional, YYYY-MM-DD</span></label>
+            <input id="deadline" name="deadline" type="text" placeholder="YYYY-MM-DD" autocomplete="off" />
+            <p class="error" data-error-for="deadline"></p>
+          </div>
+
+          <div class="field">
+            <label for="rankingExplanation">Ranking Explanation <span class="hint">optional</span></label>
+            <textarea id="rankingExplanation" name="rankingExplanation" rows="2"></textarea>
+            <p class="error" data-error-for="rankingExplanation"></p>
+          </div>
+
+          <button type="submit" class="primary">Add issue</button>
+          <p id="form-status" class="status" hidden></p>
+        </form>
+      </section>
+
+      <section id="panel-issues" class="panel" hidden>
+        <div class="counters">
+          <div class="counter counter--completed">
+            <span class="counter__label">Completed</span>
+            <span id="completed-count" class="counter__value">0</span>
+          </div>
+          <div class="counter counter--discarded">
+            <span class="counter__label">Discarded</span>
+            <span id="discarded-count" class="counter__value">0</span>
+          </div>
+        </div>
+
+        <div class="list-wrap">
+          <ul id="issue-list" class="issue-list"></ul>
+          <button type="button" id="scroll-down" class="scroll-down" hidden aria-label="More issues below">
+            ↓
+          </button>
+        </div>
+
+        <p id="empty-state" class="empty-state" hidden>
+          No issues yet. Add one on the Input tab.
+        </p>
+      </section>
+    </main>
+
+    <script src="/app.js"></script>
+  </body>
+</html>

@@ -1,0 +1,113 @@
+// Tabs, the Input form, and the Issues list.
+// Drag, detail view, badge, and the noon timer arrive in later slices.
+
+const tabs = {
+  input: document.getElementById("tab-input"),
+  issues: document.getElementById("tab-issues"),
+};
+const panels = {
+  input: document.getElementById("panel-input"),
+  issues: document.getElementById("panel-issues"),
+};
+const form = document.getElementById("issue-form");
+const formStatus = document.getElementById("form-status");
+const list = document.getElementById("issue-list");
+const emptyState = document.getElementById("empty-state");
+const completedCount = document.getElementById("completed-count");
+const discardedCount = document.getElementById("discarded-count");
+
+function showTab(name) {
+  for (const key of Object.keys(tabs)) {
+    const active = key === name;
+    tabs[key].classList.toggle("is-active", active);
+    panels[key].hidden = !active;
+  }
+}
+
+tabs.input.addEventListener("click", () => showTab("input"));
+tabs.issues.addEventListener("click", () => showTab("issues"));
+
+function clearErrors() {
+  for (const el of document.querySelectorAll("[data-error-for]")) {
+    el.textContent = "";
+  }
+}
+
+function showErrors(fields) {
+  for (const [name, message] of Object.entries(fields || {})) {
+    const el = document.querySelector(`[data-error-for="${name}"]`);
+    if (el) el.textContent = message;
+  }
+}
+
+function renderRow(issue) {
+  const row = document.createElement("li");
+  row.className = "issue-row";
+  row.dataset.id = issue.id;
+
+  const count = document.createElement("div");
+  count.className = "issue-row__count";
+  count.textContent = issue.shownCount ?? 0;
+
+  const main = document.createElement("div");
+  main.className = "issue-row__main";
+  const title = document.createElement("div");
+  title.className = "issue-row__title";
+  title.textContent = issue.title;
+  const description = document.createElement("div");
+  description.className = "issue-row__description";
+  description.textContent = issue.description;
+  main.append(title, description);
+
+  const meta = document.createElement("div");
+  meta.className = "issue-row__meta";
+  const parts = [issue.urgency, issue.difficulty, issue.deadline].filter(Boolean);
+  meta.textContent = parts.join(" · ");
+
+  row.append(count, main, meta);
+  return row;
+}
+
+function render(state) {
+  list.replaceChildren(...state.issues.map(renderRow));
+  emptyState.hidden = state.issues.length > 0;
+  completedCount.textContent = state.counters.completed;
+  discardedCount.textContent = state.counters.discarded;
+}
+
+async function loadState() {
+  const response = await fetch("/api/state");
+  const state = await response.json();
+  render(state);
+  return state;
+}
+
+form.addEventListener("submit", async (event) => {
+  event.preventDefault();
+  clearErrors();
+  formStatus.hidden = true;
+
+  const body = Object.fromEntries(new FormData(form).entries());
+
+  const response = await fetch("/api/issues", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+
+  if (!response.ok) {
+    const problem = await response.json().catch(() => ({}));
+    showErrors(problem.fields);
+    formStatus.textContent = problem.error || "Could not save the issue.";
+    formStatus.hidden = false;
+    return;
+  }
+
+  form.reset();
+  form.elements.title.focus();
+  formStatus.textContent = "Issue added. Open the Issues tab to see it.";
+  formStatus.hidden = false;
+  await loadState();
+});
+
+loadState();
