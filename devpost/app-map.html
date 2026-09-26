@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Issue Alert — App Map</title>
+    <style>
+      :root {
+        --bg: #ffffff;
+        --ink: #15181c;
+        --muted: #6b7280;
+        --line: #e5e7eb;
+        --completed: #2563b6;
+        --discarded: #c0392b;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--ink);
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+        font-size: 17px;
+        line-height: 1.5;
+      }
+      main { max-width: 56rem; margin: 0 auto; padding: 2.5rem 1.5rem 4rem; }
+      h1 { font-size: 2rem; margin: 0 0 0.25rem; }
+      .sub { color: var(--muted); margin: 0 0 2rem; }
+      h2 { font-size: 1.3rem; margin: 2.25rem 0 0.75rem; border-bottom: 2px solid var(--ink); padding-bottom: 0.35rem; }
+      code { background: #f4f5f7; padding: 0.05rem 0.3rem; border-radius: 3px; font-size: 0.95em; }
+      .lead { font-size: 1.05rem; }
+      .pieces { list-style: none; padding: 0; margin: 0; }
+      .pieces li { padding: 0.4rem 0; border-bottom: 1px solid var(--line); }
+      .pieces .path { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.95em; }
+      .flow { display: flex; flex-wrap: wrap; align-items: stretch; gap: 0.5rem; margin: 0.75rem 0 0.25rem; }
+      .flow-label { font-weight: 700; margin-top: 1.25rem; }
+      .step {
+        flex: 1 1 10rem;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        padding: 0.6rem 0.7rem;
+        background: #fafbfc;
+        min-width: 9rem;
+      }
+      .step h3 { font-size: 0.98rem; margin: 0 0 0.2rem; }
+      .step p { margin: 0; color: var(--muted); font-size: 0.85rem; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+      .arrow { align-self: center; color: var(--muted); font-size: 1.3rem; }
+      ol.route { padding-left: 1.25rem; }
+      ol.route li { margin-bottom: 0.7rem; }
+      .anchor { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.95em; }
+      .start { list-style: none; padding: 0; }
+      .start li { padding: 0.45rem 0; border-bottom: 1px solid var(--line); }
+      .note { border-left: 3px solid var(--ink); padding: 0.5rem 0 0.5rem 0.9rem; margin: 1rem 0; }
+      details { margin: 0.6rem 0; }
+      summary { cursor: pointer; font-weight: 600; }
+      footer { margin-top: 3rem; color: var(--muted); font-size: 0.9rem; border-top: 1px solid var(--line); padding-top: 1rem; }
+      a { color: var(--completed); }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Issue Alert — App Map</h1>
+      <p class="sub">A snapshot of how the finished proof of concept fits together. Source commit <code>231cbe0</code>.</p>
+
+      <p class="lead">
+        Issue Alert is a small local app. You add issues, they live in a plain-text file, and the
+        Issues tab shows up to six of them ranked by how long they have been waiting (oldest first),
+        then urgency, then difficulty, then deadline. Each row shows its age in days.
+      </p>
+
+      <h2>One action, end to end</h2>
+      <p class="flow-label">Adding an issue</p>
+      <div class="flow">
+        <div class="step"><h3>Input tab</h3><p>public/index.html · public/app.js</p></div>
+        <div class="arrow" aria-hidden="true">→</div>
+        <div class="step"><h3>POST /api/issues</h3><p>src/routes.js</p></div>
+        <div class="arrow" aria-hidden="true">→</div>
+        <div class="step"><h3>write the file</h3><p>src/store.js</p></div>
+        <div class="arrow" aria-hidden="true">→</div>
+        <div class="step"><h3>data/issues.json</h3><p>plain JSON</p></div>
+      </div>
+
+      <p class="flow-label">Seeing the ranked list</p>
+      <div class="flow">
+        <div class="step"><h3>GET /api/state</h3><p>src/routes.js</p></div>
+        <div class="arrow" aria-hidden="true">→</div>
+        <div class="step"><h3>rank()</h3><p>src/ranking.js</p></div>
+        <div class="arrow" aria-hidden="true">→</div>
+        <div class="step"><h3>renderRow()</h3><p>public/app.js</p></div>
+        <div class="arrow" aria-hidden="true">→</div>
+        <div class="step"><h3>Issues list</h3><p>ranked rows + age</p></div>
+      </div>
+
+      <h2>Main pieces</h2>
+      <ul class="pieces">
+        <li><span class="path">server.js</span> — starts Express, serves <code>public/</code>, mounts the API.</li>
+        <li><span class="path">src/config.js</span> — the settings you change in code: <code>dailyCount</code>, <code>alertTime</code>, the level lists.</li>
+        <li><span class="path">src/store.js</span> — the only code that reads/writes <code>data/issues.json</code>.</li>
+        <li><span class="path">src/ranking.js</span> — <code>rank()</code> picks the list; <code>autoCompare</code> sets the order; manual order is layered on.</li>
+        <li><span class="path">src/scheduler.js</span> — the on-open noon check and the badge logic.</li>
+        <li><span class="path">src/routes.js</span> — the API the page calls (add, edit, complete, discard, order, seen).</li>
+        <li><span class="path">public/</span> — <code>index.html</code>, <code>styles.css</code>, <code>app.js</code>: tabs, form, list, drag, detail, badge, noon timer.</li>
+        <li><span class="path">data/issues.json</span> — your issues and history, created on first run, hand-editable.</li>
+      </ul>
+
+      <h2>Guided route (walked through in this build)</h2>
+      <p>Follow the action "the list is ordered and each row shows an age":</p>
+      <ol class="route">
+        <li>
+          <span class="anchor">src/config.js</span> — the two knobs: <code>dailyCount</code> (how many show)
+          and <code>alertTime</code> (when the list is made). Settings only, no logic.
+        </li>
+        <li>
+          <span class="anchor">src/ranking.js → autoCompare</span> — the exact function the ranking decision
+          rewrote. Read its four steps in order: age → urgency → difficulty → deadline. <span class="anchor">rank()</span>
+          caps the result at <code>dailyCount</code> and lays manual placements on top.
+        </li>
+        <li>
+          <span class="anchor">public/app.js → daysSinceCreated</span> (used inside <code>renderRow</code>) — turns an
+          issue's <code>createdAt</code> into the number on the left of the row, from the data <code>/api/state</code> returns.
+        </li>
+      </ol>
+
+      <h2>To change this, start here</h2>
+      <ul class="start">
+        <li>How many issues show, or the noon time → <span class="anchor">src/config.js</span> (<code>dailyCount</code>, <code>alertTime</code>).</li>
+        <li>The ranking rule → <span class="anchor">src/ranking.js</span> (<code>autoCompare</code>).</li>
+        <li>What a row shows → <span class="anchor">public/app.js</span> (<code>renderRow</code>).</li>
+        <li>Colors and type → <span class="anchor">public/styles.css</span> (<code>:root</code> variables, <code>.issue-row__title</code>).</li>
+        <li>What the API accepts → <span class="anchor">src/routes.js</span> (<code>validateIssue</code>).</li>
+        <li>How noon and the badge work → <span class="anchor">src/scheduler.js</span> (<code>ensureGenerated</code>, <code>isBadgeVisible</code>).</li>
+      </ul>
+
+      <h2>A practice to reuse</h2>
+      <div class="note">
+        <p>
+          <strong>Decision:</strong> rank by age first, and show the age as the row's left number.<br />
+          <strong>Evidence:</strong> <span class="anchor">src/ranking.js → autoCompare</span> implements it; a seeded
+          order test confirmed it, and you could check it by hand-editing one issue's <code>createdAt</code> in
+          <code>data/issues.json</code> and refreshing.<br />
+          <strong>Reuse:</strong> when directing an agent, give one observable rule and name where it should live
+          ("the left number is days since creation; sort by it first — this belongs in <code>ranking.js</code>"),
+          then ask for a small verification you can read. A concrete instruction plus a named location plus a
+          checkable result is what made this change fast and safe to confirm.
+        </p>
+      </div>
+
+      <h2>Run it again</h2>
+      <p>
+        From the project folder: <code>npm install</code> (first time), then <code>npm start</code>, and open
+        <code>http://localhost:3000</code>. Your data is in <code>data/issues.json</code> — change it by hand and reload.
+      </p>
+
+      <details>
+        <summary>How to reopen this map</summary>
+        <p>
+          Open <code>devpost/app-map.html</code> in any browser — double-click it, or drag it into a browser window.
+          It is a static file with no scripts, so it works offline.
+        </p>
+      </details>
+
+      <details>
+        <summary>About this snapshot</summary>
+        <p>
+          This map describes the code at commit <code>231cbe0</code>. It is a snapshot and can drift if the code
+          changes later — when in doubt, check the current source against the references above.
+        </p>
+      </details>
+
+      <footer>
+        Reference route, not a specification of the learner. Personal learning notes live outside this file.
+      </footer>
+    </main>
+  </body>
+</html>

@@ -72,23 +72,24 @@ Build mode: learn
 ## Hands-on Checkpoints
 
 - [x] Early usable behavior explored — after slice 2, to confirm the ranking rule before we build on it
-- [ ] Final kick-the-tires exploration and feedback completed
+- [x] Final kick-the-tires exploration and feedback completed
 
 ## Final Review
 
-- [ ] Final review complete — feedback resolved and learner confirms ready to ship
+- No changes requested: after exploring the running app (core journey, awkward inputs, hand-editing `data/issues.json`, raising `dailyCount`), the learner reported everything looked good.
+- [x] Final review complete — no revisions needed; learner confirms ready to ship
 
 ## Code Tour and App Map
 
-- [ ] Learning activity complete — guided route, focused alternative, prior practice connected, or brief recap
-- [ ] Optional edit and transfer reflection addressed — offered/declined/already covered/not applicable as appropriate
-- [ ] `devpost/app-map.html` generated from finished code, checked, and shown, including a project-grounded practice to reuse
+- [x] Learning activity complete — guided route, focused alternative, prior practice connected, or brief recap
+- [x] Optional edit and transfer reflection addressed — offered/tried/reverted; reflection answered
+- [x] `devpost/app-map.html` generated from finished code, checked, and shown, including a project-grounded practice to reuse
 
-Activity and evidence:
-Route and stops:
-Edit outcome:
-Reflection:
-Activity mode:
+Activity and evidence: Guided route through the action "the list is ordered and each row shows an age", tied to the learner's goal of directing agents (one instruction → one small function → a checkable result). Evidence: `src/ranking.js` `autoCompare`/`rank`, `public/app.js` `daysSinceCreated`/`renderRow`, `src/config.js` `dailyCount`/`alertTime`; the seeded-order and vm timer tests run during the build.
+Route and stops: 1) `src/config.js` (`dailyCount`, `alertTime`); 2) `src/ranking.js` (`autoCompare`, `rank`); 3) `public/app.js` (`daysSinceCreated`, `renderRow`).
+Edit outcome: Learner changed `.issue-row__title` font-size 1.7rem → 2rem, viewed it, and reverted — preferred the original; no change kept, nothing committed.
+Reflection: Offered and answered. Personal answer recorded in the ignored `devpost/learner-profile.md` (focus more on concrete planning, be clearer about what they don't want, don't fear breaking things).
+Activity mode: Live app and editor (guided route).
 
 ## Revisions
 
